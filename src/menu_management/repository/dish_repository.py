@@ -1,10 +1,10 @@
 from typing import List
 
+from db import Session
 from sqlalchemy import insert, select, update, delete, func
 
 from ..models import Dish
 from ..schemas import DishResponse
-from db import Session
 
 
 class DishRepository:

@@ -1,8 +1,8 @@
 from typing import List
 
+from db import Session
 from sqlalchemy import select, insert, func, delete, update
 
-from db import Session
 from ..models import Menu
 from ..schemas import MenuResponse
 from ..utils import submenus_counter, dishes_counter

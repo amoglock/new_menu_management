@@ -2,8 +2,8 @@ from typing import List
 
 from fastapi import HTTPException
 
-from ..schemas import SubmenuResponse, CreateSubmenu, PatchSubmenu
 from ..repository.submenu_repository import SubmenuRepository
+from ..schemas import SubmenuResponse, CreateSubmenu, PatchSubmenu
 from ..utils import dishes_counter
 
 

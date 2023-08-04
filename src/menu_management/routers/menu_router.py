@@ -2,8 +2,8 @@ from typing import List
 
 from fastapi import APIRouter
 
-from ..sevices.menu_service import MenuService
 from ..schemas import MenuResponse, CreateMenu, PatchMenu
+from ..sevices.menu_service import MenuService
 
 menu_router = APIRouter(
     prefix="/api/v1/menus",

@@ -1,11 +1,9 @@
 import uuid
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
 
 class BaseResponse(BaseModel):
-    #TODO посмотреть работает ли uud
     id: uuid.UUID = Field(default=uuid.uuid4())
     title: str
     description: str
@@ -58,7 +56,3 @@ class CreateDish(DishResponse):
 
 class PatchDish(CreateSubmenu):
     price: str
-
-
-
-

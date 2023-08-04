@@ -1,7 +1,6 @@
-from sqlalchemy import Select, func
-
 from db import Session
 from menu_management.models import Submenu, Dish
+from sqlalchemy import Select, func
 
 
 def submenus_counter(menu_id: str) -> int:

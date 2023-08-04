@@ -53,12 +53,3 @@ class MenuService:
     @classmethod
     def delete_all(cls):
         MenuRepository.delete_all()
-
-
-# print((MenuService.patch_menu('b8b32ea6-89df-4ebd-9d46-dc73acce6f22', {"title": "p", "description": "padddtch"})))
-# print(MenuService.get_menu('b8b32ea6-89df-4ebd-9d46-dc73acce6f23'))
-# print(MenuRepository.get_all_menu())
-# print(MenuRepository.post_menu({"title": "m", "description": "menu3222"}))
-# print(MenuRepository.get_all_menu())
-# print(MenuService.count())
-# print(MenuService.delete('b8b32ea6-89df-4ebd-9d46-dc73acce6f23'))

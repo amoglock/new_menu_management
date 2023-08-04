@@ -2,8 +2,8 @@ from typing import List
 
 from fastapi import APIRouter
 
-from ..sevices.dish_service import DishService
 from ..schemas import DishResponse, CreateDish, PatchDish
+from ..sevices.dish_service import DishService
 
 dish_router = APIRouter(
     prefix="/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes",
