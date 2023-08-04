@@ -1,0 +1,5 @@
+.git
+.cache
+.pytest_cache
+.venv
+*.md
