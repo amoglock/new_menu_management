@@ -16,7 +16,6 @@ services:
       context: .
     container_name: fastapi_app
     entrypoint: sh -c "alembic upgrade head && cd src && gunicorn main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000"
-    command: pytest -v
     networks:
       - app_network
     env_file:
