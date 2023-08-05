@@ -1,6 +1,7 @@
-from db import Session
-from menu_management.models import Submenu, Dish
 from sqlalchemy import Select, func
+
+from db import Session
+from menu_management.models import Dish, Submenu
 
 
 def submenus_counter(menu_id: str) -> int:
@@ -10,7 +11,7 @@ def submenus_counter(menu_id: str) -> int:
         return result
 
 
-def dishes_counter(menu_id: str = None, submenu_id: str = None) -> int:
+def dishes_counter(menu_id: str | None = None, submenu_id: str | None = None) -> int | None:
     if menu_id:
         query = Select(func.count()).select_from(Dish).filter(Dish.submenu_group == Select(Submenu.id).
                                                               where(Submenu.menu_group == menu_id).scalar_subquery())
@@ -22,3 +23,4 @@ def dishes_counter(menu_id: str = None, submenu_id: str = None) -> int:
         with Session() as session:
             result = session.scalar(query)
             return result
+    return None

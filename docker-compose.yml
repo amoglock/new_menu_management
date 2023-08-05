@@ -15,14 +15,16 @@ services:
     build:
       context: .
     container_name: fastapi_app
-    entrypoint: sh -c "alembic upgrade head && cd src && gunicorn main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000"
     networks:
       - app_network
     env_file:
       .env-non-dev
+    command: ["/fastapi_app/docker/app.sh"]
     ports:
       - "8000:8000"
     depends_on:
+      - db
+    links:
       - db
 
 networks:
