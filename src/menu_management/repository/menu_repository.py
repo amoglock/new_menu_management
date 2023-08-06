@@ -1,17 +1,16 @@
-from typing import List
+from sqlalchemy import delete, func, insert, select, update
 
 from db import Session
-from sqlalchemy import select, insert, func, delete, update
 
 from ..models import Menu
 from ..schemas import MenuResponse
-from ..utils import submenus_counter, dishes_counter
+from ..utils import dishes_counter, submenus_counter
 
 
 class MenuRepository:
 
     @classmethod
-    def get_all_menu(cls) -> List[MenuResponse]:
+    def get_all_menu(cls) -> list[MenuResponse]:
         with Session() as session:
             result = session.query(Menu).all()
             result = [MenuResponse(id=r.id, title=r.title,
@@ -70,12 +69,12 @@ class MenuRepository:
             return menu_count.scalar()
 
     @classmethod
-    def delete(cls, take_id: str):
-        stmt = delete(Menu).where(Menu.id == take_id)
+    def delete(cls, menu_id: str):
+        stmt = delete(Menu).where(Menu.id == menu_id)
         with Session() as session:
             session.execute(stmt)
             session.commit()
-        return {"status": True, "message": "The menu has been deleted"}
+        return {'status': True, 'message': 'The menu has been deleted'}
 
     @classmethod
     def delete_all(cls):

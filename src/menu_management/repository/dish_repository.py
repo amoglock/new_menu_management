@@ -1,7 +1,6 @@
-from typing import List
+from sqlalchemy import delete, func, insert, select, update
 
 from db import Session
-from sqlalchemy import insert, select, update, delete, func
 
 from ..models import Dish
 from ..schemas import DishResponse
@@ -10,7 +9,7 @@ from ..schemas import DishResponse
 class DishRepository:
 
     @classmethod
-    def get_all_dishes(cls, submenu_id: str) -> List[DishResponse]:
+    def get_all_dishes(cls, submenu_id: str) -> list[DishResponse]:
         query = select(Dish).filter_by(submenu_group=submenu_id)
         with Session() as session:
             dishes = session.execute(query)
@@ -32,8 +31,8 @@ class DishRepository:
 
     @classmethod
     def post_dish(cls, submenu_id: str, values: dict) -> DishResponse:
-        values["submenu_group"] = submenu_id
-        values["price"] = str("{:.2f}".format(float(values.get("price"))))
+        values['submenu_group'] = submenu_id
+        values['price'] = str('{:.2f}'.format(values['price']))
         stmt = insert(Dish).values(**values).returning(Dish)
         with Session() as session:
             new_dish = session.execute(stmt)
@@ -56,7 +55,7 @@ class DishRepository:
                 patched_dish = DishResponse(id=patched_dish.id,
                                             title=patched_dish.title,
                                             description=patched_dish.description,
-                                            price=str("{:.2f}".format(float(patched_dish.price)))).model_dump()
+                                            price=str(f'{float(patched_dish.price):.2f}')).model_dump()
                 return patched_dish
         except Exception:
             return {}
@@ -67,7 +66,7 @@ class DishRepository:
         with Session() as session:
             session.execute(stmt)
             session.commit()
-        return {"status": True, "message": "The dish has been deleted"}
+        return {'status': True, 'message': 'The dish has been deleted'}
 
     @classmethod
     def count(cls):
