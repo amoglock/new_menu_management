@@ -14,7 +14,7 @@ class SubmenuService:
     @classmethod
     def get_all_submenus(cls, menu_id: str) -> list[SubmenuResponse]:
         cache = redis_client.get('all_submenu')
-        if cache is not None and pickle.loads(cache)[0].id == menu_id:
+        if cache is not None:
             return pickle.loads(cache)
         submenus = SubmenuRepository.get_all_submenus(menu_id)
         redis_client.set('all_submenu', pickle.dumps(submenus))

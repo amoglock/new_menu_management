@@ -7,7 +7,7 @@ from src.menu_management.sevices.menu_service import MenuService
 @pytest.fixture
 def create_menu():
     MenuService.delete_all()
-    menu = CreateMenu(title="my_menu", description="my_menu")
+    menu = CreateMenu(title='my_menu', description='my_menu')
     MenuService.post_menu(menu)
     yield
     MenuService.delete_all()
