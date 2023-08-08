@@ -17,7 +17,8 @@ git clone https://github.com/amoglock/new_menu_management
 Открыть репозиторий в IDE.<br>
 Для запуска приложения в командной строке ввести:
 ```commandline
-docker compose up --build
+docker compose build
+docker compose up
 ```
 После запуска, документация Swagger и описание приложения, доступны по адресу: http://0.0.0.0:8000/docs#/
 
@@ -27,7 +28,7 @@ docker compose up --build
 ```commandline
 pytest -v
 ```
-Чтобы остановить приложение, в командной строке ввести:
+Чтобы остановить приложение - останавливаем контейнеры клавишами ctr+c, затем в командной строке ввести:
 ```commandline
 docker compose down
 ```
