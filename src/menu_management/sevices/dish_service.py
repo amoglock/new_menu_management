@@ -40,7 +40,7 @@ class DishService:
         return new_dish
 
     @classmethod
-    def patch_dish(cls, submenu_id: str, submenu: PatchDish):
+    def patch_dish(cls, submenu_id: str, submenu: PatchDish) -> DishResponse | dict:
         submenu = submenu.to_dict()
         patched_submenu = DishRepository.patch_dish(submenu_id, submenu)
         if not patched_submenu:
@@ -50,7 +50,7 @@ class DishService:
         return patched_submenu
 
     @classmethod
-    def delete(cls, take_id: str):
+    def delete(cls, take_id: str) -> dict:
         result = DishRepository.delete(take_id)
         redis_client.delete('all_dishes')
         redis_client.delete('specific_dish')

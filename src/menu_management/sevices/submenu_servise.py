@@ -45,7 +45,7 @@ class SubmenuService:
         return new_submenu
 
     @classmethod
-    def patch_submenu(cls, submenu_id: str, submenu: PatchSubmenu) -> SubmenuResponse:
+    def patch_submenu(cls, submenu_id: str, submenu: PatchSubmenu) -> SubmenuResponse | dict:
         submenu = submenu.to_dict()
         patched_submenu = SubmenuRepository.patch_submenu(submenu_id, submenu)
         if not patched_submenu:
@@ -55,7 +55,7 @@ class SubmenuService:
         return patched_submenu
 
     @classmethod
-    def delete(cls, take_id: str):
+    def delete(cls, take_id: str) -> dict:
         result = SubmenuRepository.delete(take_id)
         redis_client.delete('all_submenu')
         redis_client.delete('specific_submenu')

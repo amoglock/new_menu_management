@@ -45,7 +45,7 @@ class MenuService:
         return new_menu
 
     @classmethod
-    def patch_menu(cls, menu_id: str, menu: PatchMenu):
+    def patch_menu(cls, menu_id: str, menu: PatchMenu) -> MenuResponse | dict:
         menu = menu.to_dict()
         patched_menu = MenuRepository.patch_menu(menu_id, menu)
         if not patched_menu:
@@ -54,7 +54,7 @@ class MenuService:
         return patched_menu
 
     @classmethod
-    def delete(cls, menu_id: str):
+    def delete(cls, menu_id: str) -> dict:
         result = MenuRepository.delete(menu_id)
         redis_client.delete('all_menu')
         redis_client.delete('specific_menu')
@@ -66,6 +66,6 @@ class MenuService:
         return counter
 
     @classmethod
-    def delete_all(cls):
+    def delete_all(cls) -> None:
         redis_client.delete('all_menu', 'specific_menu')
         MenuRepository.delete_all()
