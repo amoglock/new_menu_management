@@ -1,5 +1,4 @@
 from fastapi import APIRouter
-from fastapi_cache.decorator import cache
 
 from ..schemas import CreateDish, DishResponse, PatchDish
 from ..sevices.dish_service import DishService
@@ -13,7 +12,6 @@ dish_router = APIRouter(
 @dish_router.get('/', response_model=list[DishResponse], status_code=200,
                  description='Возвращает список блюд для подменю, если  submenu_id не существует или блюд нет'
                              ' - возвращает пустой список', summary='получить список блюд')
-@cache(expire=60)
 async def get_all_dishes(submenu_id: str):
     return DishService.get_all_dishes(submenu_id)
 
@@ -22,7 +20,6 @@ async def get_all_dishes(submenu_id: str):
                  description='Возвращает экземпляр определенного блюда по переданному dish_id. '
                              'Если dish_id не найден - вызывается исключение с ошибкой 404',
                  summary='получить определенное блюдо')
-@cache(expire=60)
 async def get_specific_dish(dish_id: str):
     return DishService.get_dish(dish_id)
 

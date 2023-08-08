@@ -10,7 +10,6 @@ cryptography==41.0.3
 distlib==0.3.7
 exceptiongroup==1.1.2
 fastapi==0.100.1
-fastapi-cache2==0.2.1
 filelock==3.12.2
 greenlet==2.0.2
 gunicorn==21.2.0

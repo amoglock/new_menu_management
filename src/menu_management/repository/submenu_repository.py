@@ -1,7 +1,6 @@
-from typing import List
+from sqlalchemy import delete, func, insert, select, update
 
 from db import Session
-from sqlalchemy import select, insert, update, delete, func
 
 from ..models import Submenu
 from ..schemas import SubmenuResponse
@@ -11,7 +10,7 @@ from ..utils import dishes_counter
 class SubmenuRepository:
 
     @classmethod
-    def get_all_submenus(cls, menu_id: str) -> List[SubmenuResponse]:
+    def get_all_submenus(cls, menu_id: str) -> list[SubmenuResponse]:
         query = select(Submenu).filter_by(menu_group=menu_id)
         with Session() as session:
             submenus = session.execute(query)
@@ -33,7 +32,7 @@ class SubmenuRepository:
 
     @classmethod
     def post_submenu(cls, menu_id: str, values: dict) -> SubmenuResponse:
-        values["menu_group"] = menu_id
+        values['menu_group'] = menu_id
         stmt = insert(Submenu).values(**values).returning(Submenu)
         with Session() as session:
             new_submenu = session.execute(stmt)
@@ -67,10 +66,10 @@ class SubmenuRepository:
         with Session() as session:
             session.execute(stmt)
             session.commit()
-        return {"status": True, "message": "The submenu has been deleted"}
+        return {'status': True, 'message': 'The submenu has been deleted'}
 
     @classmethod
-    def count(cls):
+    def count(cls) -> int:
         query = select(func.count(Submenu.id)).select_from(Submenu)
         with Session() as session:
             menu_count = session.execute(query)

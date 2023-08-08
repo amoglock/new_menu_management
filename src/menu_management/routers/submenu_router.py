@@ -1,5 +1,4 @@
 from fastapi import APIRouter
-from fastapi_cache.decorator import cache
 
 from ..schemas import CreateSubmenu, PatchSubmenu, SubmenuResponse
 from ..sevices.submenu_servise import SubmenuService
@@ -13,7 +12,6 @@ submenu_router = APIRouter(
 @submenu_router.get('/', response_model=list[SubmenuResponse], status_code=200,
                     description='Возвращает список подменю для определенного меню которое есть в базе, '
                                 'если подменю нет - возвращает пустой список', summary='получить список подменю')
-@cache(expire=60)
 async def get_submenus(menu_id: str):
     return SubmenuService.get_all_submenus(menu_id)
 
@@ -23,7 +21,6 @@ async def get_submenus(menu_id: str):
                                 'Если submenu_id не найден - вызывается исключение с ошибкой 404',
                     summary='получить определенное подменю'
                     )
-@cache(expire=60)
 async def get_specific_submenu(submenu_id: str):
     return SubmenuService.get_submenu(submenu_id)
 

@@ -20,7 +20,7 @@ class MenuRepository:
             return result
 
     @classmethod
-    def get_menu(cls, menu_id: str):
+    def get_menu(cls, menu_id: str) -> MenuResponse | None:
         try:
             query = select(Menu.__table__.columns).filter_by(id=menu_id)
             with Session() as session:
@@ -61,7 +61,7 @@ class MenuRepository:
             return {}
 
     @classmethod
-    def count(cls):
+    def count(cls) -> int:
         query = select(func.count(Menu.id)).select_from(Menu)
         with Session() as session:
             menu_count = session.execute(query)
@@ -82,8 +82,3 @@ class MenuRepository:
         with Session() as session:
             session.execute(stmt)
             session.commit()
-
-# MenuRepository.post_menu({"title": "adfffffsadas", "description": "afdsfdsfsd"})
-# MenuRepository.get_all_menu()
-# MenuRepository.delete_all()
-# MenuRepository.get_all_menu()

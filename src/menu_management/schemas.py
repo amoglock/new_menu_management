@@ -22,7 +22,7 @@ class CreateMenu(BaseModel):
     description: str
 
     def to_dict(self):
-        return self.model_dump(exclude={"id"})
+        return self.model_dump(exclude={'id'})
 
 
 class PatchMenu(CreateMenu):
@@ -47,11 +47,13 @@ class DishResponse(BaseResponse):
     price: str
 
 
-class CreateDish(DishResponse):
-    pass
+class CreateDish(BaseModel):
+    title: str
+    description: str
+    price: str
 
     def to_dict(self):
-        return self.model_dump(exclude={"id"})
+        return self.model_dump(exclude={'id'})
 
 
 class PatchDish(CreateSubmenu):

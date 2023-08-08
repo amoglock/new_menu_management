@@ -1,8 +1,6 @@
 from fastapi import FastAPI
-from fastapi_cache import FastAPICache
-from fastapi_cache.backends.redis import RedisBackend
-from redis import asyncio as aioredis
 
+from cache.client import redis_client
 from menu_management.routers.dish_router import dish_router
 from menu_management.routers.menu_router import menu_router
 from menu_management.routers.submenu_router import submenu_router
@@ -25,7 +23,6 @@ app.include_router(submenu_router)
 app.include_router(dish_router)
 
 
-@app.on_event('startup')
-async def startup():
-    redis = aioredis.from_url('redis://localhost', encoding='utf-8', decode_responce=True)
-    FastAPICache.init(RedisBackend(redis), prefix='fastapi-cache')
+@app.on_event('shutdown')
+async def on_shutdown():
+    redis_client.flushdb()

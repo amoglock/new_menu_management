@@ -1,5 +1,4 @@
 from fastapi import APIRouter
-from fastapi_cache.decorator import cache
 
 from ..schemas import CreateMenu, MenuResponse, PatchMenu
 from ..sevices.menu_service import MenuService
@@ -10,10 +9,9 @@ menu_router = APIRouter(
 )
 
 
-@menu_router.get('/', response_model=list[MenuResponse], status_code=200,
+@menu_router.get('/', status_code=200,
                  description='Возвращает список меню которые есть в базе, '
                              'если база пуста - возвращает пустой список', summary='получить список меню')
-@cache(expire=60)
 async def get_all_menus():
     return MenuService.get_all_menu()
 
@@ -21,7 +19,6 @@ async def get_all_menus():
 @menu_router.get('/{menu_id}', response_model=MenuResponse, status_code=200,
                  description='Возвращает экземпляр определенного меню по переданному menu_id. Если menu_id не найден - '
                              'вызывается исключение с ошибкой 404', summary='получить определенное меню')
-@cache(expire=60)
 async def get_specific_menu(menu_id: str):
     return MenuService.get_menu(menu_id)
 

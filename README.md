@@ -1,4 +1,4 @@
-<h1 align="center">Проект на FastAPI с использованием PostgreSQL в качестве базы данных</h1> 
+<h1 align="center">Проект на FastAPI с использованием PostgreSQL в качестве базы данных</h1>
 <p align="center">
 <img src="https://img.shields.io/badge/python-3.10-blue?logo=python">
 <img src="https://img.shields.io/badge/fastapi-v0.100.0-green?logo=fastapi">
@@ -19,7 +19,9 @@ git clone https://github.com/amoglock/new_menu_management
 ```commandline
 docker compose up --build
 ```
-После запуска, документация Swagger доступна по адресу: http://0.0.0.0:8000/docs#/
+После запуска, документация Swagger и описание приложения, доступны по адресу: http://0.0.0.0:8000/docs#/
+
+Приложение кеширует запросы в базу Redis. После остановки приложения кэш очищается.
 
 Чтобы запустить тесты, при запущенном приложении в командной строке ввести:
 ```commandline

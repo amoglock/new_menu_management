@@ -32,7 +32,7 @@ class DishRepository:
     @classmethod
     def post_dish(cls, submenu_id: str, values: dict) -> DishResponse:
         values['submenu_group'] = submenu_id
-        values['price'] = str('{:.2f}'.format(values['price']))
+        values['price'] = str('{:.2f}'.format(float(str(values.get('price')))))
         stmt = insert(Dish).values(**values).returning(Dish)
         with Session() as session:
             new_dish = session.execute(stmt)
@@ -69,7 +69,7 @@ class DishRepository:
         return {'status': True, 'message': 'The dish has been deleted'}
 
     @classmethod
-    def count(cls):
+    def count(cls) -> int:
         query = select(func.count(Dish.id)).select_from(Dish)
         with Session() as session:
             menu_count = session.execute(query)
