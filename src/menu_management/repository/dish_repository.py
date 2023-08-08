@@ -45,7 +45,7 @@ class DishRepository:
             return new_dish
 
     @classmethod
-    def patch_dish(cls, dish_id: str, dish: dict):
+    def patch_dish(cls, dish_id: str, dish: dict) -> DishResponse | dict:
         stmt = update(Dish).where(Dish.id == dish_id).values(dish).returning(Dish)
         try:
             with Session() as session:
@@ -61,7 +61,7 @@ class DishRepository:
             return {}
 
     @classmethod
-    def delete(cls, take_id: str):
+    def delete(cls, take_id: str) -> dict[str, bool | str]:
         stmt = delete(Dish).where(Dish.id == take_id)
         with Session() as session:
             session.execute(stmt)

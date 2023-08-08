@@ -44,7 +44,7 @@ class MenuRepository:
             return new_menu
 
     @classmethod
-    def patch_menu(cls, menu_id: str, menu: dict):
+    def patch_menu(cls, menu_id: str, menu: dict) -> MenuResponse | dict:
         stmt = update(Menu).where(Menu.id == menu_id).values(menu).returning(Menu)
         try:
             with Session() as session:
@@ -69,7 +69,7 @@ class MenuRepository:
             return menu_count.scalar()
 
     @classmethod
-    def delete(cls, menu_id: str):
+    def delete(cls, menu_id: str) -> dict[str, bool | str]:
         stmt = delete(Menu).where(Menu.id == menu_id)
         with Session() as session:
             session.execute(stmt)

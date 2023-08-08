@@ -45,7 +45,7 @@ class SubmenuRepository:
             return new_submenu
 
     @classmethod
-    def patch_submenu(cls, submenu_id: str, submenu: dict):
+    def patch_submenu(cls, submenu_id: str, submenu: dict) -> SubmenuResponse | dict:
         stmt = update(Submenu).where(Submenu.id == submenu_id).values(submenu).returning(Submenu)
         try:
             with Session() as session:
@@ -61,7 +61,7 @@ class SubmenuRepository:
             return {}
 
     @classmethod
-    def delete(cls, take_id: str):
+    def delete(cls, take_id: str) -> dict[str, str | bool]:
         stmt = delete(Submenu).where(Submenu.id == take_id)
         with Session() as session:
             session.execute(stmt)
