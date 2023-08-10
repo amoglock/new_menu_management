@@ -9,7 +9,7 @@ from ..schemas import CreateDish, DishResponse, PatchDish
 class DishService:
 
     @classmethod
-    def get_all_dishes(cls, submenu_id: str) -> list[DishResponse]:
+    async def get_all_dishes(cls, submenu_id: str) -> list[DishResponse]:
         cache = get_cache('all_dish', submenu_id)
         if cache:
             return cache
@@ -18,7 +18,7 @@ class DishService:
         return dishes
 
     @classmethod
-    def get_dish(cls, dish_id: str) -> dict:
+    async def get_dish(cls, dish_id: str) -> dict:
         dish = DishRepository.get_dish(dish_id)
         if not dish:
             raise HTTPException(status_code=404, detail='dish not found')
@@ -31,7 +31,7 @@ class DishService:
         return dish.model_dump()
 
     @classmethod
-    def post_dish(cls, submenu_id: str, menu_id: str, dish: CreateDish) -> DishResponse:
+    async def post_dish(cls, submenu_id: str, menu_id: str, dish: CreateDish) -> DishResponse:
         new_dish = dish.to_dict()
         new_dish = DishRepository.post_dish(submenu_id, new_dish)
         clear_cache('all_dish', submenu_id)
@@ -43,7 +43,7 @@ class DishService:
         return new_dish
 
     @classmethod
-    def patch_dish(cls, submenu_id: str, submenu: PatchDish) -> DishResponse | dict:
+    async def patch_dish(cls, submenu_id: str, submenu: PatchDish) -> DishResponse | dict:
         submenu = submenu.to_dict()
         patched_dish = DishRepository.patch_dish(submenu_id, submenu)
         if not patched_dish:
@@ -53,7 +53,7 @@ class DishService:
         return patched_dish
 
     @classmethod
-    def delete(cls, dish_id: str, submenu_id: str) -> dict:
+    async def delete(cls, dish_id: str, submenu_id: str) -> dict:
         result = DishRepository.delete(dish_id)
         clear_cache('all_dish', submenu_id)
         clear_cache('submenu', 'all_submenu')
@@ -62,6 +62,6 @@ class DishService:
         return result
 
     @classmethod
-    def count(cls) -> int:
+    async def count(cls) -> int:
         counter = DishRepository.count()
         return counter

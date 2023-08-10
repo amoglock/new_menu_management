@@ -10,7 +10,7 @@ from ..utils import dishes_counter
 class SubmenuService:
 
     @classmethod
-    def get_all_submenus(cls, menu_id: str) -> list[SubmenuResponse]:
+    async def get_all_submenus(cls, menu_id: str) -> list[SubmenuResponse]:
         cache = get_cache('submenu', 'all_submenu')
         if cache:
             return cache
@@ -19,7 +19,7 @@ class SubmenuService:
         return submenus
 
     @classmethod
-    def get_submenu(cls, submenu_id: str) -> dict:
+    async def get_submenu(cls, submenu_id: str) -> dict:
         submenu = SubmenuRepository.get_submenu(submenu_id)
 
         if not submenu:
@@ -35,7 +35,7 @@ class SubmenuService:
         return submenu.model_dump()
 
     @classmethod
-    def post_submenu(cls, menu_id: str, submenu: CreateSubmenu) -> SubmenuResponse:
+    async def post_submenu(cls, menu_id: str, submenu: CreateSubmenu) -> SubmenuResponse:
         new_submenu = submenu.to_dict()
         new_submenu = SubmenuRepository.post_submenu(menu_id, new_submenu)
         clear_cache('submenu', 'all_submenu')
@@ -45,7 +45,7 @@ class SubmenuService:
         return new_submenu
 
     @classmethod
-    def patch_submenu(cls, submenu_id: str, submenu: PatchSubmenu) -> SubmenuResponse | dict:
+    async def patch_submenu(cls, submenu_id: str, submenu: PatchSubmenu) -> SubmenuResponse | dict:
         submenu = submenu.to_dict()
         patched_submenu = SubmenuRepository.patch_submenu(submenu_id, submenu)
         if not patched_submenu:
@@ -55,7 +55,7 @@ class SubmenuService:
         return patched_submenu
 
     @classmethod
-    def delete(cls, submenu_id: str, menu_id: str) -> dict:
+    async def delete(cls, submenu_id: str, menu_id: str) -> dict:
         result = SubmenuRepository.delete(submenu_id)
         clear_cache('submenu', 'all_submenu')
         clear_cache('submenu', submenu_id)
@@ -66,6 +66,6 @@ class SubmenuService:
         return result
 
     @classmethod
-    def count(cls) -> int:
+    async def count(cls) -> int:
         counter = SubmenuRepository.count()
         return counter

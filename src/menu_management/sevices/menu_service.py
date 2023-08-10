@@ -10,7 +10,7 @@ from ..utils import dishes_counter, submenus_counter
 class MenuService:
 
     @classmethod
-    def get_all_menu(cls) -> list[MenuResponse] | list:
+    async def get_all_menu(cls) -> list[MenuResponse] | list:
         cache = get_cache('menu', 'all_menu')
         if cache:
             return cache
@@ -19,7 +19,7 @@ class MenuService:
         return menus
 
     @classmethod
-    def get_menu(cls, menu_id: str) -> dict:
+    async def get_menu(cls, menu_id: str) -> dict:
         menu = MenuRepository.get_menu(menu_id)
 
         if menu is None:
@@ -36,7 +36,7 @@ class MenuService:
         return menu.model_dump()
 
     @classmethod
-    def post_menu(cls, menu: CreateMenu) -> MenuResponse:
+    async def post_menu(cls, menu: CreateMenu) -> MenuResponse:
         new_menu = menu.to_dict()
         new_menu = MenuRepository.post_menu(new_menu)
         set_cache('menu', new_menu.id, new_menu)
@@ -44,7 +44,7 @@ class MenuService:
         return new_menu
 
     @classmethod
-    def patch_menu(cls, menu_id: str, menu: PatchMenu) -> MenuResponse | dict:
+    async def patch_menu(cls, menu_id: str, menu: PatchMenu) -> MenuResponse | dict:
         menu = menu.to_dict()
         patched_menu = MenuRepository.patch_menu(menu_id, menu)
         if not patched_menu:
@@ -54,18 +54,18 @@ class MenuService:
         return patched_menu
 
     @classmethod
-    def delete(cls, menu_id: str) -> dict:
+    async def delete(cls, menu_id: str) -> dict:
         result = MenuRepository.delete(menu_id)
         clear_cache('menu', 'all_menu')
         clear_cache('menu', menu_id)
         return result
 
     @classmethod
-    def count(cls) -> int:
+    async def count(cls) -> int:
         counter = MenuRepository.count()
         return counter
 
     @classmethod
-    def delete_all(cls) -> None:
+    async def delete_all(cls) -> None:
         redis_client.flushdb()
         MenuRepository.delete_all()

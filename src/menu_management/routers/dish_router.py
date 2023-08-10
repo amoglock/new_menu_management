@@ -13,7 +13,7 @@ dish_router = APIRouter(
                  description='Возвращает список блюд для подменю, если  submenu_id не существует или блюд нет'
                              ' - возвращает пустой список', summary='получить список блюд')
 async def get_all_dishes(submenu_id: str):
-    return DishService.get_all_dishes(submenu_id)
+    return await DishService.get_all_dishes(submenu_id)
 
 
 @dish_router.get('/{dish_id}', response_model=DishResponse, status_code=200,
@@ -21,14 +21,14 @@ async def get_all_dishes(submenu_id: str):
                              'Если dish_id не найден - вызывается исключение с ошибкой 404',
                  summary='получить определенное блюдо')
 async def get_specific_dish(dish_id: str):
-    return DishService.get_dish(dish_id)
+    return await DishService.get_dish(dish_id)
 
 
 @dish_router.post('/', response_model=DishResponse, status_code=201,
                   description='Создает новое блюдо. Принимает схему с названием, описанием и ценой. '
                               'Возвращает объект нового блюда', summary='создать новое блюдо')
 async def add_dish(submenu_id: str, menu_id: str, new_submenu: CreateDish):
-    return DishService.post_dish(submenu_id, menu_id, new_submenu)
+    return await DishService.post_dish(submenu_id, menu_id, new_submenu)
 
 
 @dish_router.patch('/{dish_id}', response_model=DishResponse, status_code=200,
@@ -36,11 +36,11 @@ async def add_dish(submenu_id: str, menu_id: str, new_submenu: CreateDish):
                                'Возвращает обновленный экземпляр. Если dish_id не найден - '
                                'вызывается исключение с ошибкой 404', summary='Изменить существующее блюдо')
 async def patch_menu(dish_id: str, new_submenu: PatchDish):
-    return DishService.patch_dish(dish_id, new_submenu)
+    return await DishService.patch_dish(dish_id, new_submenu)
 
 
 @dish_router.delete('/{dish_id}', response_model=dict, status_code=200,
                     description='Удаляет существующее блюдо. Принимает dish_id для поиска.'
                                 'Возвращает словарь с информацией, что удаление совершено.', summary='удалить меню')
 async def delete_menu(dish_id: str, submenu_id: str):
-    return DishService.delete(dish_id, submenu_id)
+    return await DishService.delete(dish_id, submenu_id)
