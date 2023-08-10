@@ -14,4 +14,4 @@ def setup_db():
     yield
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
-    redis_client.flushall()
+    redis_client.flushdb()

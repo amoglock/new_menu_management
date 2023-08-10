@@ -1,3 +1,4 @@
+import uuid
 from contextlib import nullcontext as does_not_raise
 
 import pytest
@@ -10,6 +11,8 @@ from src.menu_management.sevices.submenu_servise import SubmenuService
 
 @pytest.mark.usefixtures('create_menu_submenu')
 class TestDish:
+    menu_id: str = str(uuid.uuid4())
+
     def test_get_all_dishes_empty_base(self, get_submenu_id):
         """Checks response is empty list with empty base"""
 
@@ -34,7 +37,8 @@ class TestDish:
 
         assert DishService.count() == 0
         with expectation:
-            DishService.post_dish(get_submenu_id, CreateDish(title=title, description=description, price=price))
+            DishService.post_dish(get_submenu_id, self.menu_id,
+                                  CreateDish(title=title, description=description, price=price))
             assert SubmenuService.count() == 1
 
     def test_get_all_dishes(self, get_submenu_id):
@@ -46,7 +50,7 @@ class TestDish:
         ]
 
         for dish in dishes:
-            DishService.post_dish(get_submenu_id, dish)
+            DishService.post_dish(get_submenu_id, self.menu_id, dish)
             res = DishService.get_all_dishes(get_submenu_id)
             assert isinstance(res, list)
             for r in res:
@@ -56,7 +60,7 @@ class TestDish:
         """Checks correct response for request dish by id. Checks response get_dish() is DishResp. instance"""
 
         dish = CreateDish(title='my_submenu', description='my_submenu', price='12.3456')
-        added_dish = DishService.post_dish(get_submenu_id, dish)
+        added_dish = DishService.post_dish(get_submenu_id, self.menu_id, dish)
         assert isinstance(added_dish, DishResponse)
         assert DishService.get_dish(str(added_dish.id)) == added_dish.model_dump()
 
@@ -65,7 +69,7 @@ class TestDish:
 
         dish = CreateDish(title='my_submenu', description='my_submenu', price='15.2')
         correct_for_dish = PatchDish(title='my_corrected_dish', description='my_corrected_dish', price='16')
-        new_dish = DishService.post_dish(get_submenu_id, dish)
+        new_dish = DishService.post_dish(get_submenu_id, self.menu_id, dish)
         corrected_dish = DishService.patch_dish(str(new_dish.id), correct_for_dish)
         assert corrected_dish.get('title') == correct_for_dish.title
         assert corrected_dish.get('description') == correct_for_dish.description
@@ -75,7 +79,7 @@ class TestDish:
         """Checks deleting is correct"""
 
         dish = CreateDish(title='my_dish', description='my_dish', price='12.34')
-        added_dish = DishService.post_dish(get_submenu_id, dish)
+        added_dish = DishService.post_dish(get_submenu_id, self.menu_id, dish)
         assert DishService.count() == 1
-        DishService.delete(str(added_dish.id))
+        DishService.delete(str(added_dish.id), get_submenu_id)
         assert DishService.count() == 0

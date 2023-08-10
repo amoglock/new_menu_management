@@ -59,7 +59,7 @@ class TestSubmenu:
         submenu = CreateSubmenu(title='my_submenu', description='my_submenu')
         added_submenu = SubmenuService.post_submenu(get_menu_id, submenu)
         assert isinstance(added_submenu, SubmenuResponse)
-        assert SubmenuService.get_submenu(str(added_submenu.id)) == added_submenu.model_dump()
+        assert SubmenuService.get_submenu(str(added_submenu.id)) == added_submenu
 
     def test_patch_submenu(self, get_menu_id):
         """Checks correct patched submenu"""
@@ -74,7 +74,7 @@ class TestSubmenu:
     def test_delete_menu(self, get_menu_id):
         """Checks deleting is correct"""
         submenu = CreateSubmenu(title='my_submenu', description='my_submenu')
-        added_menu = SubmenuService.post_submenu(get_menu_id, submenu)
+        added_submenu = SubmenuService.post_submenu(get_menu_id, submenu)
         assert SubmenuService.count() == 1
-        SubmenuService.delete(str(added_menu.id))
+        SubmenuService.delete(str(added_submenu.id), get_menu_id)
         assert SubmenuService.count() == 0

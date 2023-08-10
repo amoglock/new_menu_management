@@ -18,6 +18,7 @@ def dishes_counter(menu_id: str | None = None, submenu_id: str | None = None) ->
         with Session() as session:
             result = session.scalar(query)
             return result
+
     if submenu_id:
         query = Select(func.count()).select_from(Dish).where(Dish.submenu_group == submenu_id)
         with Session() as session:

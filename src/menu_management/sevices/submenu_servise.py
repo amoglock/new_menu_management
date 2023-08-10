@@ -1,8 +1,6 @@
-import pickle
-
 from fastapi import HTTPException
 
-from cache.client import redis_client
+from cache.client import clear_cache, get_cache, set_cache
 
 from ..repository.submenu_repository import SubmenuRepository
 from ..schemas import CreateSubmenu, PatchSubmenu, SubmenuResponse
@@ -13,11 +11,11 @@ class SubmenuService:
 
     @classmethod
     def get_all_submenus(cls, menu_id: str) -> list[SubmenuResponse]:
-        cache = redis_client.get('all_submenu')
-        if cache is not None:
-            return pickle.loads(cache)
+        cache = get_cache('submenu', 'all_submenu')
+        if cache:
+            return cache
         submenus = SubmenuRepository.get_all_submenus(menu_id)
-        redis_client.set('all_submenu', pickle.dumps(submenus))
+        set_cache('submenu', 'all_submenu', submenus)
         return submenus
 
     @classmethod
@@ -27,21 +25,23 @@ class SubmenuService:
         if not submenu:
             raise HTTPException(status_code=404, detail='submenu not found')
 
-        cache = redis_client.get('specific_submenu')
-        if cache is not None and pickle.loads(cache)['id'] == submenu_id:
-            return pickle.loads(cache)
+        cache = get_cache('submenu', submenu_id)
+        if cache:
+            return cache
 
         dishes_count = dishes_counter(submenu_id=submenu.get('id'))
         submenu = SubmenuResponse(**submenu, dishes_count=dishes_count)
-        redis_client.set('specific_submenu', pickle.dumps(submenu.model_dump()))
+        set_cache('submenu', submenu_id, submenu.model_dump())
         return submenu.model_dump()
 
     @classmethod
     def post_submenu(cls, menu_id: str, submenu: CreateSubmenu) -> SubmenuResponse:
         new_submenu = submenu.to_dict()
         new_submenu = SubmenuRepository.post_submenu(menu_id, new_submenu)
-        redis_client.delete('all_submenu')
-        redis_client.delete('specific_submenu')
+        clear_cache('submenu', 'all_submenu')
+        clear_cache('menu', 'all_menu')
+        clear_cache('menu', menu_id)
+        set_cache('submenu', new_submenu.id, new_submenu)
         return new_submenu
 
     @classmethod
@@ -50,15 +50,19 @@ class SubmenuService:
         patched_submenu = SubmenuRepository.patch_submenu(submenu_id, submenu)
         if not patched_submenu:
             raise HTTPException(status_code=404, detail='submenu not found')
-        redis_client.delete('all_submenu')
-        redis_client.delete('specific_submenu')
+        clear_cache('submenu', 'all_submenu')
+        set_cache('submenu', submenu_id, patched_submenu)
         return patched_submenu
 
     @classmethod
-    def delete(cls, take_id: str) -> dict:
-        result = SubmenuRepository.delete(take_id)
-        redis_client.delete('all_submenu')
-        redis_client.delete('specific_submenu')
+    def delete(cls, submenu_id: str, menu_id: str) -> dict:
+        result = SubmenuRepository.delete(submenu_id)
+        clear_cache('submenu', 'all_submenu')
+        clear_cache('submenu', submenu_id)
+        clear_cache('menu', 'all_menu')
+        clear_cache('menu', menu_id)
+        clear_cache('dish', submenu_id)
+        clear_cache('all_dish', submenu_id)
         return result
 
     @classmethod

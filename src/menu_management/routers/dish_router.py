@@ -27,8 +27,8 @@ async def get_specific_dish(dish_id: str):
 @dish_router.post('/', response_model=DishResponse, status_code=201,
                   description='Создает новое блюдо. Принимает схему с названием, описанием и ценой. '
                               'Возвращает объект нового блюда', summary='создать новое блюдо')
-async def add_dish(submenu_id: str, new_submenu: CreateDish):
-    return DishService.post_dish(submenu_id, new_submenu)
+async def add_dish(submenu_id: str, menu_id: str, new_submenu: CreateDish):
+    return DishService.post_dish(submenu_id, menu_id, new_submenu)
 
 
 @dish_router.patch('/{dish_id}', response_model=DishResponse, status_code=200,
@@ -42,5 +42,5 @@ async def patch_menu(dish_id: str, new_submenu: PatchDish):
 @dish_router.delete('/{dish_id}', response_model=dict, status_code=200,
                     description='Удаляет существующее блюдо. Принимает dish_id для поиска.'
                                 'Возвращает словарь с информацией, что удаление совершено.', summary='удалить меню')
-async def delete_menu(dish_id: str):
-    return DishService.delete(dish_id)
+async def delete_menu(dish_id: str, submenu_id: str):
+    return DishService.delete(dish_id, submenu_id)
