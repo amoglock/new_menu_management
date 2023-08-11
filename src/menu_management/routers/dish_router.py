@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from ..schemas import CreateDish, DishResponse, PatchDish
-from ..sevices.dish_service import DishService
+from menu_management.schemas import CreateDish, DishResponse, PatchDish
+from menu_management.sevices.dish_service import DishService
 
 dish_router = APIRouter(
     prefix='/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes',

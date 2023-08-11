@@ -1,84 +1,81 @@
+from fastapi import HTTPException
 from sqlalchemy import delete, func, insert, select, update
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
-from db import Session
-
-from ..models import Menu
-from ..schemas import MenuResponse
-from ..utils import dishes_counter, submenus_counter
+from db import engine
+from menu_management.models import Menu
+from menu_management.schemas import MenuResponse
 
 
 class MenuRepository:
 
     @classmethod
-    def get_all_menu(cls) -> list[MenuResponse]:
-        with Session() as session:
-            result = session.query(Menu).all()
-            result = [MenuResponse(id=r.id, title=r.title,
-                                   description=r.description,
-                                   submenus_count=submenus_counter(r.id),
-                                   dishes_count=dishes_counter(menu_id=r.id)) for r in result]
+    async def get_menu_list(cls) -> list[MenuResponse]:
+        stmt = select(Menu)
+        async with engine.connect() as conn:
+            result = await conn.execute(stmt)
             return result
 
     @classmethod
-    def get_menu(cls, menu_id: str) -> MenuResponse | None:
+    async def get_menu(cls, menu_id: str) -> MenuResponse:
+        stmt = select(Menu).where(Menu.id == menu_id)
         try:
-            query = select(Menu.__table__.columns).filter_by(id=menu_id)
-            with Session() as session:
-                menus = session.execute(query)
-                return menus.mappings().one()
-        except Exception:
-            return None
+            async with engine.connect() as conn:
+                result = await conn.execute(stmt)
+                result = result.fetchone()
+                return result
+        except SQLAlchemyError as e:
+            print('Error:', e.args)
 
     @classmethod
-    def post_menu(cls, values: dict) -> MenuResponse:
+    async def add_new_menu(cls, values: dict) -> MenuResponse:
         stmt = insert(Menu).values(**values).returning(Menu)
-        with Session() as session:
-            new_menu = session.execute(stmt)
-            session.commit()
-            new_menu = new_menu.scalar()
-            new_menu = MenuResponse(id=new_menu.id,
-                                    title=new_menu.title,
-                                    description=new_menu.description,
-                                    submenus_count=submenus_counter(new_menu.id),
-                                    dishes_count=dishes_counter(menu_id=new_menu.id))
-            return new_menu
+        async with engine.connect() as conn:
+            async with conn.begin():
+                try:
+                    new_menu = await conn.execute(stmt)
+                    new_menu = new_menu.fetchone()
+                    return new_menu
+                except IntegrityError:
+                    raise HTTPException(status_code=409, detail='This menu name already exists')
 
     @classmethod
-    def patch_menu(cls, menu_id: str, menu: dict) -> MenuResponse | dict:
+    async def patch_menu(cls, menu_id: str, menu: dict) -> MenuResponse:
         stmt = update(Menu).where(Menu.id == menu_id).values(menu).returning(Menu)
         try:
-            with Session() as session:
-                patched_menu = session.execute(stmt)
-                session.commit()
-                patched_menu = patched_menu.scalar()
-                patched_menu = MenuResponse(id=patched_menu.id,
-                                            title=patched_menu.title,
-                                            description=patched_menu.description,
-                                            submenus_count=submenus_counter(patched_menu.id),
-                                            dishes_count=dishes_counter(menu_id=patched_menu.id)).model_dump()
-                return patched_menu
-        except Exception:
-            return {}
+            async with engine.connect() as conn:
+                async with conn.begin():
+                    new_menu = await conn.execute(stmt)
+                    new_menu = new_menu.fetchone()
+                    return new_menu
+        except IntegrityError:
+            raise HTTPException(status_code=409, detail='This menu name already exists')
+        except SQLAlchemyError as e:
+            print('Error:', e.args)
 
     @classmethod
-    def count(cls) -> int:
-        query = select(func.count(Menu.id)).select_from(Menu)
-        with Session() as session:
-            menu_count = session.execute(query)
-            session.commit()
-            return menu_count.scalar()
+    async def delete(cls, menu_id: str) -> dict[str, bool | str]:
+        stmt = delete(Menu).where(Menu.id == menu_id).returning(Menu)
+        try:
+            async with engine.connect() as conn:
+                async with conn.begin():
+                    deleted_menu = await conn.execute(stmt)
+                    if deleted_menu.fetchone():
+                        return {'status': True, 'message': 'The menu has been deleted'}
+                    return {}
+        except SQLAlchemyError as e:
+            return {'status': False, 'message': e.args}
 
     @classmethod
-    def delete(cls, menu_id: str) -> dict[str, bool | str]:
-        stmt = delete(Menu).where(Menu.id == menu_id)
-        with Session() as session:
-            session.execute(stmt)
-            session.commit()
-        return {'status': True, 'message': 'The menu has been deleted'}
+    async def count(cls) -> int:
+        stmt = select(func.count()).select_from(Menu)
+        async with engine.connect() as conn:
+            result = await conn.scalar(stmt)
+            return result
 
     @classmethod
-    def delete_all(cls):
+    async def delete_all(cls):
         stmt = delete(Menu)
-        with Session() as session:
-            session.execute(stmt)
-            session.commit()
+        async with engine.connect() as conn:
+            async with conn.begin():
+                conn.execute(stmt)

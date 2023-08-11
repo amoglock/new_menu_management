@@ -1,10 +1,9 @@
 from fastapi import HTTPException
 
 from cache.client import clear_cache, get_cache, set_cache
-
-from ..repository.submenu_repository import SubmenuRepository
-from ..schemas import CreateSubmenu, PatchSubmenu, SubmenuResponse
-from ..utils import dishes_counter
+from menu_management.repository.submenu_repository import SubmenuRepository
+from menu_management.schemas import CreateSubmenu, PatchSubmenu, SubmenuResponse
+from menu_management.utils import dishes_counter
 
 
 class SubmenuService:

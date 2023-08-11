@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from ..schemas import CreateMenu, MenuResponse, PatchMenu
-from ..sevices.menu_service import MenuService
+from menu_management.schemas import CreateMenu, MenuResponse, PatchMenu
+from menu_management.sevices.menu_service import MenuService
 
 menu_router = APIRouter(
     prefix='/api/v1/menus',
@@ -9,11 +9,12 @@ menu_router = APIRouter(
 )
 
 
-@menu_router.get('/', status_code=200,
+@menu_router.get('/', response_model=list[MenuResponse], status_code=200,
                  description='Возвращает список меню которые есть в базе, '
                              'если база пуста - возвращает пустой список', summary='получить список меню')
 async def get_all_menus():
-    return await MenuService.get_all_menu()
+    result = await MenuService.get_all_menu()
+    return result
 
 
 @menu_router.get('/{menu_id}', response_model=MenuResponse, status_code=200,

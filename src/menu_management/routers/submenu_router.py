@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from ..schemas import CreateSubmenu, PatchSubmenu, SubmenuResponse
-from ..sevices.submenu_servise import SubmenuService
+from menu_management.schemas import CreateSubmenu, PatchSubmenu, SubmenuResponse
+from menu_management.sevices.submenu_servise import SubmenuService
 
 submenu_router = APIRouter(
     prefix='/api/v1/menus/{menu_id}/submenus',

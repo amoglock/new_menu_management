@@ -1,9 +1,8 @@
 from fastapi import HTTPException
 
 from cache.client import clear_cache, get_cache, set_cache
-
-from ..repository.dish_repository import DishRepository
-from ..schemas import CreateDish, DishResponse, PatchDish
+from menu_management.repository.dish_repository import DishRepository
+from menu_management.schemas import CreateDish, DishResponse, PatchDish
 
 
 class DishService:
