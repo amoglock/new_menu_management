@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 from sqlalchemy import delete, func, insert, select, update
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.exc import DBAPIError, IntegrityError
 
 from db import engine
 from menu_management.models import Menu
@@ -24,8 +24,8 @@ class MenuRepository:
                 result = await conn.execute(stmt)
                 result = result.fetchone()
                 return result
-        except SQLAlchemyError as e:
-            print('Error:', e.args)
+        except DBAPIError as e:
+            raise HTTPException(status_code=404, detail=f'{e.orig}')
 
     @classmethod
     async def add_new_menu(cls, values: dict) -> MenuResponse:
@@ -50,8 +50,8 @@ class MenuRepository:
                     return new_menu
         except IntegrityError:
             raise HTTPException(status_code=409, detail='This menu name already exists')
-        except SQLAlchemyError as e:
-            print('Error:', e.args)
+        except DBAPIError as e:
+            raise HTTPException(status_code=404, detail=f'{e.orig}')
 
     @classmethod
     async def delete(cls, menu_id: str) -> dict[str, bool | str]:
@@ -61,10 +61,10 @@ class MenuRepository:
                 async with conn.begin():
                     deleted_menu = await conn.execute(stmt)
                     if deleted_menu.fetchone():
-                        return {'status': True, 'message': 'The menu has been deleted'}
-                    return {}
-        except SQLAlchemyError as e:
-            return {'status': False, 'message': e.args}
+                        return {'status': True, 'message': 'menu has been deleted'}
+                    return {'status': False, 'message': 'menu not found'}
+        except DBAPIError as e:
+            raise HTTPException(status_code=404, detail=f'{e.orig}')
 
     @classmethod
     async def count(cls) -> int:

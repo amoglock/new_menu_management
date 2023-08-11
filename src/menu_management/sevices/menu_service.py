@@ -15,15 +15,14 @@ class MenuService:
         #     return cache
         menus = await MenuRepository.get_menu_list()
         # await set_cache('menu', 'all_menu', menus)
-        return menus
+        return [await cls.__turn_to_model(menu) for menu in menus]
 
     #
     @classmethod
     async def get_menu(cls, menu_id: str) -> MenuResponse:
         menu = await MenuRepository.get_menu(menu_id)
         await cls.__check_response(menu)
-        menu = await cls.__turn_to_model(menu)
-        return menu
+        return await cls.__turn_to_model(menu)
 
         # cache = get_cache('menu', menu_id)
         # if cache:
@@ -34,7 +33,6 @@ class MenuService:
     async def post_menu(cls, new_menu: CreateMenu) -> MenuResponse:
         new_menu = new_menu.to_dict()
         added_menu = await MenuRepository.add_new_menu(new_menu)
-        added_menu = await cls.__turn_to_model(added_menu)
         # set_cache('menu', new_menu.id, new_menu)
         # clear_cache('menu', 'all_menu')
         return added_menu
@@ -44,15 +42,15 @@ class MenuService:
         menu = menu.to_dict()
         patched_menu = await MenuRepository.patch_menu(menu_id, menu)
         await cls.__check_response(patched_menu)
-        patched_menu = await cls.__turn_to_model(patched_menu)
-        return patched_menu
+        return await cls.__turn_to_model(patched_menu)
         # clear_cache('menu', 'all_menu')
         # set_cache('menu', menu_id, patched_menu)
 
     @classmethod
     async def delete(cls, menu_id: str):
         result = await MenuRepository.delete(menu_id)
-        await cls.__check_response(result)
+        # print(result)
+        # await cls.__check_response(result)
         # clear_cache('menu', 'all_menu')
         # clear_cache('menu', menu_id)
         return result

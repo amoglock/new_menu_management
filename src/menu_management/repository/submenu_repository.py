@@ -1,75 +1,77 @@
-# from sqlalchemy import delete, func, insert, select, update
-#
-# from menu_management.models import Submenu
-# from menu_management.schemas import SubmenuResponse
-# from menu_management.utils import dishes_counter
-#
-#
-# class SubmenuRepository:
-#
-#     @classmethod
-#     def get_all_submenus(cls, menu_id: str) -> list[SubmenuResponse]:
-#         query = select(Submenu).filter_by(menu_group=menu_id)
-#         with Session() as session:
-#             submenus = session.execute(query)
-#             result = submenus.scalars().all()
-#             result = [SubmenuResponse(id=r.id, title=r.title,
-#                                       description=r.description,
-#                                       dishes_count=dishes_counter(submenu_id=r.id)) for r in result]
-#             return result
-#
-#     @classmethod
-#     def get_submenu(cls, submenu_id: str) -> dict:
-#         try:
-#             query = select(Submenu.__table__.columns).filter_by(id=submenu_id)
-#             with Session() as session:
-#                 menus = session.execute(query)
-#                 return menus.mappings().one()
-#         except Exception:
-#             return {}
-#
-#     @classmethod
-#     def post_submenu(cls, menu_id: str, values: dict) -> SubmenuResponse:
-#         values['menu_group'] = menu_id
-#         stmt = insert(Submenu).values(**values).returning(Submenu)
-#         with Session() as session:
-#             new_submenu = session.execute(stmt)
-#             session.commit()
-#             new_submenu = new_submenu.scalar()
-#             new_submenu = SubmenuResponse(id=new_submenu.id,
-#                                           title=new_submenu.title,
-#                                           description=new_submenu.description,
-#                                           dishes_count=dishes_counter(submenu_id=new_submenu.id))
-#             return new_submenu
-#
-#     @classmethod
-#     def patch_submenu(cls, submenu_id: str, submenu: dict) -> SubmenuResponse | dict:
-#         stmt = update(Submenu).where(Submenu.id == submenu_id).values(submenu).returning(Submenu)
-#         try:
-#             with Session() as session:
-#                 patched_submenu = session.execute(stmt)
-#                 session.commit()
-#                 patched_submenu = patched_submenu.scalar()
-#                 patched_submenu = SubmenuResponse(id=patched_submenu.id,
-#                                                   title=patched_submenu.title,
-#                                                   description=patched_submenu.description,
-#                                                   dishes_count=dishes_counter(menu_id=patched_submenu.id)).model_dump()
-#                 return patched_submenu
-#         except Exception:
-#             return {}
-#
-#     @classmethod
-#     def delete(cls, take_id: str) -> dict[str, str | bool]:
-#         stmt = delete(Submenu).where(Submenu.id == take_id)
-#         with Session() as session:
-#             session.execute(stmt)
-#             session.commit()
-#         return {'status': True, 'message': 'The submenu has been deleted'}
-#
-#     @classmethod
-#     def count(cls) -> int:
-#         query = select(func.count(Submenu.id)).select_from(Submenu)
-#         with Session() as session:
-#             menu_count = session.execute(query)
-#             session.commit()
-#             return menu_count.scalar()
+from fastapi import HTTPException
+from sqlalchemy import delete, func, insert, select, update
+from sqlalchemy.exc import DBAPIError, IntegrityError
+
+from db import engine
+from menu_management.models import Submenu
+from menu_management.schemas import SubmenuResponse
+
+
+class SubmenuRepository:
+
+    @classmethod
+    async def get_list_submenus(cls, menu_id: str) -> list[SubmenuResponse]:
+        stmt = select(Submenu).filter_by(menu_group=menu_id)
+        try:
+            async with engine.connect() as conn:
+                result = await conn.execute(stmt)
+                return result
+        except DBAPIError as e:
+            raise HTTPException(status_code=404, detail=f'{e.orig}')
+
+    @classmethod
+    async def get_submenu(cls, submenu_id: str):
+        query = select(Submenu).where(Submenu.id == submenu_id)
+        try:
+            async with engine.connect() as conn:
+                result = await conn.execute(query)
+                result = result.fetchone()
+                return result
+        except DBAPIError as e:
+            raise HTTPException(status_code=404, detail=f'{e.orig}')
+
+    @classmethod
+    async def add_submenu(cls, values: dict) -> SubmenuResponse:
+        stmt = insert(Submenu).values(**values).returning(Submenu)
+        async with engine.connect() as conn:
+            async with conn.begin():
+                try:
+                    new_submenu = await conn.execute(stmt)
+                    new_submenu = new_submenu.fetchone()
+                    return new_submenu
+                except IntegrityError:
+                    raise HTTPException(status_code=409, detail='This submenu title already exists')
+                except DBAPIError as e:
+                    raise HTTPException(status_code=404, detail=f'{e.orig}')
+
+    @classmethod
+    async def update_submenu(cls, submenu_id: str, submenu: dict) -> SubmenuResponse:
+        stmt = update(Submenu).where(Submenu.id == submenu_id).values(submenu).returning(Submenu)
+        try:
+            async with engine.connect() as conn:
+                async with conn.begin():
+                    new_submenu = await conn.execute(stmt)
+                    new_submenu = new_submenu.fetchone()
+                    return new_submenu
+        except DBAPIError as e:
+            raise HTTPException(status_code=404, detail=f'{e.orig}')
+
+    @classmethod
+    async def delete_submenu(cls, take_id: str) -> dict[str, str | bool]:
+        stmt = delete(Submenu).where(Submenu.id == take_id).returning(Submenu)
+        try:
+            async with engine.connect() as conn:
+                async with conn.begin():
+                    deleted_submenu = await conn.execute(stmt)
+                    if deleted_submenu.fetchone():
+                        return {'status': True, 'message': 'submenu has been deleted'}
+                    return {'status': False, 'message': 'submenu not found'}
+        except DBAPIError as e:
+            raise HTTPException(status_code=404, detail=f'{e.orig}')
+
+    @classmethod
+    async def count(cls) -> int:
+        stmt = select(func.count()).select_from(Submenu)
+        async with engine.connect() as conn:
+            result = await conn.scalar(stmt)
+            return result
