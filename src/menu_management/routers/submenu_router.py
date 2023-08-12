@@ -40,7 +40,7 @@ async def patch_menu(submenu_id: str, new_submenu: PatchSubmenu):
     return await SubmenuService.patch_submenu(submenu_id, new_submenu)
 
 
-@submenu_router.delete('/{submenu_id}', status_code=200,
+@submenu_router.delete('/{submenu_id}', response_model=dict, status_code=200,
                        description='Удаляет существующее подменю. Принимает submenu_id для поиска.Возвращает '
                                    'словарь с информацией, что удаление совершено.', summary='удалить подменю')
 async def delete_menu(submenu_id: str, menu_id: str):

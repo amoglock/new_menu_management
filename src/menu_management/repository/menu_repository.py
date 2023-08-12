@@ -18,7 +18,7 @@ class MenuRepository:
 
     @classmethod
     async def get_menu(cls, menu_id: str) -> MenuResponse:
-        stmt = select(Menu).where(Menu.id == menu_id)
+        stmt = select(Menu).where(Menu.id == menu_id).limit(1)
         try:
             async with engine.connect() as conn:
                 result = await conn.execute(stmt)

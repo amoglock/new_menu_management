@@ -21,7 +21,7 @@ class SubmenuRepository:
 
     @classmethod
     async def get_submenu(cls, submenu_id: str):
-        query = select(Submenu).where(Submenu.id == submenu_id)
+        query = select(Submenu).where(Submenu.id == submenu_id).limit(1)
         try:
             async with engine.connect() as conn:
                 result = await conn.execute(query)
