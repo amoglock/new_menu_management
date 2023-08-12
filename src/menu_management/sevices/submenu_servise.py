@@ -9,7 +9,7 @@ from menu_management.utils import dishes_counter
 class SubmenuService:
 
     @classmethod
-    async def get_all_submenus(cls, menu_id: str) -> list[SubmenuResponse] | dict:
+    async def get_all_submenus(cls, menu_id: str) -> list[SubmenuResponse]:
         # cache = get_cache('submenu', 'all_submenu')
         # if cache:
         #     return cache
@@ -45,7 +45,7 @@ class SubmenuService:
         raise HTTPException(status_code=404, detail='wrong menu id')
 
     @classmethod
-    async def patch_submenu(cls, submenu_id: str, submenu: PatchSubmenu) -> SubmenuResponse | dict:
+    async def patch_submenu(cls, submenu_id: str, submenu: PatchSubmenu) -> SubmenuResponse:
         submenu = submenu.to_dict()
         patched_submenu = await SubmenuRepository.update_submenu(submenu_id, submenu)
         await cls.__check_response(patched_submenu)
@@ -54,7 +54,7 @@ class SubmenuService:
         # set_cache('submenu', submenu_id, patched_submenu)
 
     @classmethod
-    async def delete(cls, submenu_id: str, menu_id: str) -> dict:
+    async def delete(cls, submenu_id: str, menu_id: str) -> dict[str, str | bool]:
         result = await SubmenuRepository.delete_submenu(submenu_id)
         await cls.__check_response(result)
         return result

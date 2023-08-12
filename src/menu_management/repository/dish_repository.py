@@ -45,7 +45,7 @@ class DishRepository:
                     raise HTTPException(status_code=404, detail=f'{e.orig}')
 
     @classmethod
-    async def update_dish(cls, dish_id: str, dish: dict) -> DishResponse | dict:
+    async def update_dish(cls, dish_id: str, dish: dict) -> DishResponse:
         stmt = update(Dish).where(Dish.id == dish_id).values(dish).returning(Dish)
         try:
             async with engine.connect() as conn:

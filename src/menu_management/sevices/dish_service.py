@@ -58,7 +58,7 @@ class DishService:
         # set_cache('dish', patched_dish['id'], patched_dish)
 
     @classmethod
-    async def delete(cls, dish_id: str, submenu_id: str) -> dict:
+    async def delete(cls, dish_id: str, submenu_id: str) -> dict[str, bool | str]:
         result = await DishRepository.delete_dish(dish_id)
         # clear_cache('all_dish', submenu_id)
         # clear_cache('submenu', 'all_submenu')

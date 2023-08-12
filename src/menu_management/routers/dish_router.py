@@ -1,3 +1,5 @@
+from typing import Union
+
 from fastapi import APIRouter
 
 from menu_management.schemas import CreateDish, DishResponse, PatchDish
@@ -39,7 +41,7 @@ async def patch_menu(dish_id: str, new_submenu: PatchDish):
     return await DishService.patch_dish(dish_id, new_submenu)
 
 
-@dish_router.delete('/{dish_id}', response_model=dict, status_code=200,
+@dish_router.delete('/{dish_id}', response_model=dict[str, Union[str, bool]], status_code=200,
                     description='Удаляет существующее блюдо. Принимает dish_id для поиска.'
                                 'Возвращает словарь с информацией, что удаление совершено.', summary='удалить меню')
 async def delete_menu(dish_id: str, submenu_id: str):

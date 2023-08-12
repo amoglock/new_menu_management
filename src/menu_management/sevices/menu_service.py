@@ -9,7 +9,7 @@ from menu_management.utils import dishes_counter, submenus_counter
 class MenuService:
 
     @classmethod
-    async def get_all_menu(cls) -> list[MenuResponse] | list:
+    async def get_all_menu(cls) -> list[MenuResponse] | None:
         # cache = get_cache('menu', 'all_menu')
         # if isinstance(cache, list):
         #     return cache
@@ -47,7 +47,7 @@ class MenuService:
         # set_cache('menu', menu_id, patched_menu)
 
     @classmethod
-    async def delete(cls, menu_id: str):
+    async def delete(cls, menu_id: str) -> dict[str, str | bool]:
         result = await MenuRepository.delete(menu_id)
         # print(result)
         # await cls.__check_response(result)
