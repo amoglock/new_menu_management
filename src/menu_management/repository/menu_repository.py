@@ -37,7 +37,7 @@ class MenuRepository:
                     new_menu = new_menu.fetchone()
                     return new_menu
                 except IntegrityError:
-                    raise HTTPException(status_code=409, detail='This menu name already exists')
+                    raise HTTPException(status_code=409, detail='This menu title already exists')
 
     @classmethod
     async def patch_menu(cls, menu_id: str, menu: dict) -> MenuResponse:

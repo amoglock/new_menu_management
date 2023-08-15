@@ -17,7 +17,6 @@ class MenuService:
         # await set_cache('menu', 'all_menu', menus)
         return [await cls.__turn_to_model(menu) for menu in menus]
 
-    #
     @classmethod
     async def get_menu(cls, menu_id: str) -> MenuResponse:
         menu = await MenuRepository.get_menu(menu_id)

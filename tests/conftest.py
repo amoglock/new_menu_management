@@ -1,17 +1,36 @@
-import pytest
+import asyncio
+from typing import AsyncGenerator
 
-from src.cache.client import redis_client
-from src.config import get_mode
-from src.db import engine
+import pytest
+from httpx import AsyncClient
+from sqlalchemy import NullPool
+from sqlalchemy.ext.asyncio import create_async_engine
+
+from src.config import db_url
+from src.main import app
 from src.menu_management.models import Base
+
+DATABASE_URL_TEST = db_url()
+engine_test = create_async_engine(DATABASE_URL_TEST, poolclass=NullPool)
 
 
 @pytest.fixture(scope='session', autouse=True)
-def setup_db():
-    Base.metadata.drop_all(engine)
-    assert get_mode() == 'TEST'
-    Base.metadata.create_all(engine)
+async def setup_db():
+    async with engine_test.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
     yield
-    Base.metadata.drop_all(engine)
-    Base.metadata.create_all(engine)
-    redis_client.flushdb()
+    async with engine_test.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+
+
+@pytest.fixture(scope='session')
+def event_loop(request):
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
+
+
+@pytest.fixture(scope='session')
+async def ac() -> AsyncGenerator[AsyncClient, None]:
+    async with AsyncClient(app=app, base_url='http://test') as ac:
+        yield ac

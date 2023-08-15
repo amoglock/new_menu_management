@@ -5,9 +5,9 @@ from menu_management.models import Dish, Submenu
 
 
 async def submenus_counter(menu_id: str) -> int:
-    query = Select(func.count()).select_from(Submenu).where(Submenu.menu_group == menu_id)
+    stmt = Select(func.count()).select_from(Submenu).where(Submenu.menu_group == menu_id)
     async with engine.connect() as conn:
-        result = await conn.scalar(query)
+        result = await conn.scalar(stmt)
         return result
 
 
