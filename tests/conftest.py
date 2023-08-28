@@ -15,7 +15,12 @@ engine_test = create_async_engine(DATABASE_URL_TEST, poolclass=NullPool)
 
 
 @pytest.fixture(scope='session', autouse=True)
-async def setup_db():
+async def setup_db() -> AsyncGenerator:
+    """
+    Creates tables before tests and drop all tables after tests done
+
+    :return: AsyncGenerator
+    """
     async with engine_test.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield
@@ -32,12 +37,23 @@ def event_loop(request):
 
 @pytest.fixture(scope='session')
 async def ac() -> AsyncGenerator[AsyncClient, None]:
+    """
+    Async client for tests
+
+    :return: AsyncClient
+    """
     async with AsyncClient(app=app, base_url='http://test') as ac:
         yield ac
 
 
 @pytest.fixture
 async def get_menu_id(ac: AsyncClient) -> str:
+    """
+    Returns menu_id from not empty database for use in tests
+
+    :param ac: Async client
+    :return: str menu_id for fist menu in list
+    """
     response = await ac.get('/api/v1/menus/')
     menu_id = response.json()[0].get('id')
     return menu_id
