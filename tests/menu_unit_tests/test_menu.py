@@ -141,8 +141,7 @@ class TestMenu:
 
     async def test_get_specific_menu(self, ac: AsyncClient):
         """
-        #TODO fix POST to GET
-        Test POST request for /api/v1/menus/menu_id
+        Test GET request for /api/v1/menus/menu_id
 
         :param ac: Async client from conftest.py
         :return: None
