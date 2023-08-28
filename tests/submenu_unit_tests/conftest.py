@@ -1,19 +1,8 @@
-import pytest
+# import pytest
+# from httpx import AsyncClient
 
-from src.menu_management.schemas import CreateMenu
-from src.menu_management.sevices.menu_service import MenuService
-
-
-@pytest.fixture
-def create_menu():
-    MenuService.delete_all()
-    menu = CreateMenu(title='my_menu', description='my_menu')
-    MenuService.post_menu(menu)
-    yield
-    MenuService.delete_all()
-
-
-@pytest.fixture
-def get_menu_id():
-    menu_id = MenuService.get_all_menu()[0]
-    return str(menu_id.id)
+# @pytest.fixture
+# async def get_menu_id(ac: AsyncClient) -> str:
+#     response = await ac.get('/api/v1/menus/')
+#     menu_id = response.json()[0].get('id')
+#     return menu_id

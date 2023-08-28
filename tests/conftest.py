@@ -34,3 +34,10 @@ def event_loop(request):
 async def ac() -> AsyncGenerator[AsyncClient, None]:
     async with AsyncClient(app=app, base_url='http://test') as ac:
         yield ac
+
+
+@pytest.fixture
+async def get_menu_id(ac: AsyncClient) -> str:
+    response = await ac.get('/api/v1/menus/')
+    menu_id = response.json()[0].get('id')
+    return menu_id
