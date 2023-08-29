@@ -57,3 +57,18 @@ async def get_menu_id(ac: AsyncClient) -> str:
     response = await ac.get('/api/v1/menus/')
     menu_id = response.json()[0].get('id')
     return menu_id
+
+
+@pytest.fixture
+async def get_submenu_id(ac: AsyncClient) -> str:
+    """
+    Returns submenu_id from not empty database for use in tests
+
+    :param ac: Async client
+    :return: str submenu_id for fist submenu in list
+    """
+    response = await ac.get('/api/v1/menus/')
+    menu_id = response.json()[0].get('id')
+    response = await ac.get(f'/api/v1/menus/{menu_id}/submenus/')
+    submenu_id = response.json()[0].get('id')
+    return submenu_id
