@@ -46,7 +46,7 @@ async def ac() -> AsyncGenerator[AsyncClient, None]:
         yield ac
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 async def get_menu_id(ac: AsyncClient) -> str:
     """
     Returns menu_id from not empty database for use in tests
@@ -59,7 +59,7 @@ async def get_menu_id(ac: AsyncClient) -> str:
     return menu_id
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 async def get_submenu_id(ac: AsyncClient) -> str:
     """
     Returns submenu_id from not empty database for use in tests
