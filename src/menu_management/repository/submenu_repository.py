@@ -2,9 +2,9 @@ from fastapi import HTTPException
 from sqlalchemy import delete, func, insert, select, update
 from sqlalchemy.exc import DBAPIError, IntegrityError
 
-from db import engine
-from menu_management.models import Submenu
-from menu_management.schemas import SubmenuResponse
+from src.db import engine
+from src.menu_management.models import Submenu
+from src.menu_management.schemas import SubmenuResponse
 
 
 class SubmenuRepository:

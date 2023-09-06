@@ -2,8 +2,8 @@ from typing import Union
 
 from fastapi import APIRouter
 
-from menu_management.schemas import CreateSubmenu, PatchSubmenu, SubmenuResponse
-from menu_management.sevices.submenu_servise import SubmenuService
+from src.menu_management.schemas import CreateSubmenu, PatchSubmenu, SubmenuResponse
+from src.menu_management.sevices.submenu_servise import SubmenuService
 
 submenu_router = APIRouter(
     prefix='/api/v1/menus/{menu_id}/submenus',

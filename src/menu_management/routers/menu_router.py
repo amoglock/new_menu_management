@@ -2,8 +2,8 @@ from typing import Union
 
 from fastapi import APIRouter
 
-from menu_management.schemas import CreateMenu, MenuResponse, PatchMenu
-from menu_management.sevices.menu_service import MenuService
+from src.menu_management.schemas import CreateMenu, MenuResponse, PatchMenu
+from src.menu_management.sevices.menu_service import MenuService
 
 menu_router = APIRouter(
     prefix='/api/v1/menus',

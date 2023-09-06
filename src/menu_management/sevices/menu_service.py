@@ -1,9 +1,9 @@
 from fastapi import HTTPException
 
 # from cache.client import clear_cache, get_cache, redis_client, set_cache
-from menu_management.repository.menu_repository import MenuRepository
-from menu_management.schemas import CreateMenu, MenuResponse, PatchMenu
-from menu_management.utils import dishes_counter, submenus_counter
+from src.menu_management.repository.menu_repository import MenuRepository
+from src.menu_management.schemas import CreateMenu, MenuResponse, PatchMenu
+from src.menu_management.utils import dishes_counter, submenus_counter
 
 
 class MenuService:

@@ -15,7 +15,7 @@ MODE = os.environ.get('MODE')
 
 
 def db_url():
-    return f'postgresql+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
+    return f'postgresql+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}?async_fallback=True'
 
 
 def get_mode():

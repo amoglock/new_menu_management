@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 
-from cache.client import redis_client
-from menu_management.routers.dish_router import dish_router
-from menu_management.routers.menu_router import menu_router
-from menu_management.routers.submenu_router import submenu_router
+from src.cache.client import redis_client
+from src.menu_management.routers.dish_router import dish_router
+from src.menu_management.routers.menu_router import menu_router
+from src.menu_management.routers.submenu_router import submenu_router
 
 app = FastAPI(
     title='Menu management',

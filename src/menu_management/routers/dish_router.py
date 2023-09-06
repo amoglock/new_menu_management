@@ -2,8 +2,8 @@ from typing import Union
 
 from fastapi import APIRouter
 
-from menu_management.schemas import CreateDish, DishResponse, PatchDish
-from menu_management.sevices.dish_service import DishService
+from src.menu_management.schemas import CreateDish, DishResponse, PatchDish
+from src.menu_management.sevices.dish_service import DishService
 
 dish_router = APIRouter(
     prefix='/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes',

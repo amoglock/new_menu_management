@@ -2,9 +2,9 @@ from fastapi import HTTPException
 from sqlalchemy import delete, func, insert, select, update
 from sqlalchemy.exc import DBAPIError, IntegrityError
 
-from db import engine
-from menu_management.models import Dish
-from menu_management.schemas import DishResponse
+from src.db import engine
+from src.menu_management.models import Dish
+from src.menu_management.schemas import DishResponse
 
 
 class DishRepository:
