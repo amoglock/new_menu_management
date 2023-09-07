@@ -6,8 +6,6 @@ load_dotenv()
 
 class Settings(BaseSettings):
 
-    MODE: str
-
     DB_NAME: str
     DB_HOST: str
     DB_PORT: int
