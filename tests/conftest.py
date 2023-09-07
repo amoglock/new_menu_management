@@ -6,11 +6,11 @@ from httpx import AsyncClient
 from sqlalchemy import NullPool
 from sqlalchemy.ext.asyncio import create_async_engine
 
-from src.config import db_url
+from src.config import settings
 from src.main import app
 from src.menu_management.models import Base
 
-DATABASE_URL_TEST = db_url()
+DATABASE_URL_TEST = settings.db_url
 engine_test = create_async_engine(DATABASE_URL_TEST, poolclass=NullPool)
 
 
