@@ -2,7 +2,7 @@ from typing import Union
 
 from fastapi import APIRouter
 
-from src.menu_management.schemas import CreateMenu, MenuResponse, PatchMenu
+from src.menu_management.schemas.schemas import CreateMenu, MenuResponse, PatchMenu
 from src.menu_management.sevices.menu_service import MenuService
 
 menu_router = APIRouter(

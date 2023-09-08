@@ -2,7 +2,11 @@ from fastapi import HTTPException
 
 # from cache.client import clear_cache, get_cache, set_cache
 from src.menu_management.repository.submenu_repository import SubmenuRepository
-from src.menu_management.schemas import CreateSubmenu, PatchSubmenu, SubmenuResponse
+from src.menu_management.schemas.schemas import (
+    CreateSubmenu,
+    PatchSubmenu,
+    SubmenuResponse,
+)
 from src.menu_management.utils import dishes_counter
 
 

@@ -2,7 +2,7 @@ from fastapi import HTTPException
 
 # from cache.client import clear_cache, get_cache, set_cache
 from src.menu_management.repository.dish_repository import DishRepository
-from src.menu_management.schemas import CreateDish, DishResponse, PatchDish
+from src.menu_management.schemas.schemas import CreateDish, DishResponse, PatchDish
 from src.menu_management.sevices.submenu_servise import SubmenuService
 
 

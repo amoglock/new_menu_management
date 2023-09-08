@@ -2,7 +2,7 @@ from typing import Union
 
 from fastapi import APIRouter
 
-from src.menu_management.schemas import CreateDish, DishResponse, PatchDish
+from src.menu_management.schemas.schemas import CreateDish, DishResponse, PatchDish
 from src.menu_management.sevices.dish_service import DishService
 
 dish_router = APIRouter(
