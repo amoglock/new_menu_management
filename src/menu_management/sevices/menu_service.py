@@ -13,13 +13,13 @@ class MenuService:
     def __init__(self, menu_repository: MenuRepository = Depends()) -> None:
         self.menu_repository = menu_repository
 
-    async def get_all_menu(self) -> list[Menu] | None:
+    async def get_all_menu(self) -> list[MenuResponse] | None:
         # cache = get_cache('menu', 'all_menu')
         # if isinstance(cache, list):
         #     return cache
         menus = await self.menu_repository.get_menu_list()
         # await set_cache('menu', 'all_menu', menus)
-        return menus
+        return [await self.__turn_to_model(menu) for menu in menus]
 
     async def get_menu(self, menu_id: str) -> MenuResponse:
         menu = await self.menu_repository.get_menu(menu_id)
