@@ -1,7 +1,7 @@
 from sqlalchemy import Select, func
 
-from src.db import engine
-from src.menu_management.models import Dish, Submenu
+from src.database.db import engine
+from src.database.models import Dish, Submenu
 
 
 async def submenus_counter(menu_id: str) -> int:
