@@ -1,0 +1,18 @@
+services:
+  db_test:
+    image: postgres:15.1-alpine
+    container_name: app_database_test
+    env_file:
+      - .test.env
+
+  fastapi:
+    build:
+      dockerfile: Dockerfile
+    container_name: fastapi_app_test
+    env_file:
+      - .test.env
+    ports:
+      - 8000:8000
+    depends_on:
+      - db_test
+    command: /bin/bash -c "sleep 5 && pytest -v"
