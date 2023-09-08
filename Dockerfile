@@ -12,3 +12,5 @@ COPY src/ /app/src
 
 COPY alembic/ /app/alembic
 COPY alembic.ini /app
+COPY tests/ /app/tests
+COPY pytest.ini /app/pytest.ini
