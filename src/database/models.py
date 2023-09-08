@@ -9,7 +9,7 @@ class Base(DeclarativeBase):
 
 
 class Menu(Base):
-    __tablename__ = "menu"
+    __tablename__ = 'menu'
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     title: Mapped[str] = mapped_column(nullable=False, unique=True)
@@ -17,19 +17,19 @@ class Menu(Base):
 
 
 class Submenu(Base):
-    __tablename__ = "submenu"
+    __tablename__ = 'submenu'
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     title: Mapped[str] = mapped_column(nullable=False, unique=True)
     description: Mapped[str] = mapped_column(nullable=False)
-    menu_group: Mapped[str] = mapped_column(ForeignKey("menu.id", ondelete='CASCADE'))
+    menu_group: Mapped[str] = mapped_column(ForeignKey('menu.id', ondelete='CASCADE'))
 
 
 class Dish(Base):
-    __tablename__ = "dish"
+    __tablename__ = 'dish'
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     title: Mapped[str] = mapped_column(nullable=False, unique=True)
     description: Mapped[str] = mapped_column(nullable=False)
     price: Mapped[str] = mapped_column(nullable=False)
-    submenu_group: Mapped[str] = mapped_column(ForeignKey("submenu.id", ondelete='CASCADE'))
+    submenu_group: Mapped[str] = mapped_column(ForeignKey('submenu.id', ondelete='CASCADE'))
