@@ -3,8 +3,6 @@ from contextlib import nullcontext as does_not_raise
 import pytest
 from httpx import AsyncClient
 
-from src.menu_management.sevices.submenu_servise import SubmenuService
-
 
 class TestSubmenu:
     random_id = '5f4a67c2-832e-4975-b5cf-c3ed35015d98'
@@ -40,7 +38,7 @@ class TestSubmenu:
         })
         response = await ac.get(f'/api/v1/menus/{get_menu_id}/submenus/')
         assert response.status_code == 200
-        assert len(response.json()) == await SubmenuService.count()
+        assert len(response.json()) == 1
         assert response.json() == [{'id': response.json()[0].get('id'), 'title': 'test_submenu',
                                     'description': 'description', 'dishes_count': 0}]
 
