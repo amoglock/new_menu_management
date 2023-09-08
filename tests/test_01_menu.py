@@ -3,8 +3,6 @@ from contextlib import nullcontext as does_not_raise
 import pytest
 from httpx import AsyncClient
 
-from src.menu_management.sevices.menu_service import MenuService
-
 
 class TestMenu:
     """
@@ -40,7 +38,7 @@ class TestMenu:
         })
         response = await ac.get('/api/v1/menus/')
         assert response.status_code == 200
-        assert len(response.json()) == await MenuService.count_menu()
+        assert len(response.json()) == 1
         assert response.json() == [{'id': response.json()[0].get('id'), 'title': 'test_menu',
                                     'description': 'description', 'submenus_count': 0, 'dishes_count': 0}]
 

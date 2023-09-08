@@ -1,81 +1,65 @@
-from fastapi import HTTPException
-from sqlalchemy import delete, func, insert, select, update
+from fastapi import Depends, HTTPException
+from sqlalchemy import delete, insert, select, update
 from sqlalchemy.exc import DBAPIError, IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.database.db import engine
+from src.database.db import get_session
 from src.database.models import Menu
-from src.menu_management.schemas.schemas import MenuResponse
 
 
 class MenuRepository:
 
-    @classmethod
-    async def get_menu_list(cls) -> list[MenuResponse]:
-        stmt = select(Menu)
-        async with engine.connect() as conn:
-            result = await conn.execute(stmt)
-            return result
+    def __init__(self, session: AsyncSession = Depends(get_session)):
+        self.session = session
 
-    @classmethod
-    async def get_menu(cls, menu_id: str) -> MenuResponse:
+    async def get_menu_list(self):
+        stmt = select(Menu)
+        result = await self.session.execute(stmt)
+        return result.scalars().fetchall()
+
+    async def get_menu(self, menu_id: str) -> Menu:
         stmt = select(Menu).where(Menu.id == menu_id).limit(1)
         try:
-            async with engine.connect() as conn:
-                result = await conn.execute(stmt)
-                result = result.fetchone()
-                return result
+            result = await self.session.execute(stmt)
+            result = result.scalar()
+            return result
         except DBAPIError as e:
             raise HTTPException(status_code=404, detail=f'{e.orig}')
 
-    @classmethod
-    async def add_new_menu(cls, values: dict) -> MenuResponse:
+    async def add_new_menu(self, values: dict) -> Menu:
         stmt = insert(Menu).values(**values).returning(Menu)
-        async with engine.connect() as conn:
-            async with conn.begin():
-                try:
-                    new_menu = await conn.execute(stmt)
-                    new_menu = new_menu.fetchone()
-                    return new_menu
-                except IntegrityError:
-                    raise HTTPException(status_code=409, detail='This menu title already exists')
+        try:
+            new_menu = await self.session.execute(stmt)
+            await self.session.commit()
+            new_menu = new_menu.scalar()
+            return new_menu
+        except IntegrityError:
+            raise HTTPException(status_code=409, detail='This menu title already exists')
 
-    @classmethod
-    async def patch_menu(cls, menu_id: str, menu: dict) -> MenuResponse:
+    async def patch_menu(self, menu_id: str, menu: dict) -> Menu:
         stmt = update(Menu).where(Menu.id == menu_id).values(menu).returning(Menu)
         try:
-            async with engine.connect() as conn:
-                async with conn.begin():
-                    new_menu = await conn.execute(stmt)
-                    new_menu = new_menu.fetchone()
-                    return new_menu
+            new_menu = await self.session.execute(stmt)
+            await self.session.commit()
+            new_menu = new_menu.scalar()
+            return new_menu
         except IntegrityError:
             raise HTTPException(status_code=409, detail='This menu name already exists')
         except DBAPIError as e:
             raise HTTPException(status_code=404, detail=f'{e.orig}')
 
-    @classmethod
-    async def delete(cls, menu_id: str) -> dict[str, bool | str]:
+    async def delete(self, menu_id: str) -> dict[str, bool | str]:
         stmt = delete(Menu).where(Menu.id == menu_id).returning(Menu)
         try:
-            async with engine.connect() as conn:
-                async with conn.begin():
-                    deleted_menu = await conn.execute(stmt)
-                    if deleted_menu.fetchone():
-                        return {'status': True, 'message': 'menu has been deleted'}
-                    return {'status': False, 'message': 'menu not found'}
+            deleted_menu = await self.session.execute(stmt)
+            await self.session.commit()
+            if deleted_menu.fetchone():
+                return {'status': True, 'message': 'menu has been deleted'}
+            return {'status': False, 'message': 'menu not found'}
         except DBAPIError as e:
             raise HTTPException(status_code=404, detail=f'{e.orig}')
 
-    @classmethod
-    async def count(cls) -> int:
-        stmt = select(func.count()).select_from(Menu)
-        async with engine.connect() as conn:
-            result = await conn.scalar(stmt)
-            return result
-
-    @classmethod
-    async def delete_all(cls):
+    async def delete_all(self):
         stmt = delete(Menu)
-        async with engine.connect() as conn:
-            async with conn.begin():
-                conn.execute(stmt)
+        await self.session.execute(stmt)
+        await self.session.commit()

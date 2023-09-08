@@ -1,4 +1,6 @@
-from fastapi import HTTPException
+from fastapi import Depends, HTTPException
+
+from src.database.models import Menu
 
 # from cache.client import clear_cache, get_cache, redis_client, set_cache
 from src.menu_management.repository.menu_repository import MenuRepository
@@ -8,61 +10,52 @@ from src.menu_management.utils import dishes_counter, submenus_counter
 
 class MenuService:
 
-    @classmethod
-    async def get_all_menu(cls) -> list[MenuResponse] | None:
+    def __init__(self, menu_repository: MenuRepository = Depends()):
+        self.menu_repository = menu_repository
+
+    async def get_all_menu(self) -> list[MenuResponse] | None:
         # cache = get_cache('menu', 'all_menu')
         # if isinstance(cache, list):
         #     return cache
-        menus = await MenuRepository.get_menu_list()
+        menus = await self.menu_repository.get_menu_list()
         # await set_cache('menu', 'all_menu', menus)
-        return [await cls.__turn_to_model(menu) for menu in menus]
+        return menus
 
-    @classmethod
-    async def get_menu(cls, menu_id: str) -> MenuResponse:
-        menu = await MenuRepository.get_menu(menu_id)
-        await cls.__check_response(menu)
-        return await cls.__turn_to_model(menu)
+    async def get_menu(self, menu_id: str) -> MenuResponse:
+        menu = await self.menu_repository.get_menu(menu_id)
+        await self.__check_response(menu)
+        return await self.__turn_to_model(menu)
 
         # cache = get_cache('menu', menu_id)
         # if cache:
         #     return cache
         # set_cache('menu', menu_id, menu)
 
-    @classmethod
-    async def post_menu(cls, new_menu: CreateMenu) -> MenuResponse:
+    async def post_menu(self, new_menu: CreateMenu) -> Menu:
         new_menu = new_menu.to_dict()
-        added_menu = await MenuRepository.add_new_menu(new_menu)
+        added_menu = await self.menu_repository.add_new_menu(new_menu)
         # set_cache('menu', new_menu.id, new_menu)
         # clear_cache('menu', 'all_menu')
         return added_menu
 
-    @classmethod
-    async def patch_menu(cls, menu_id: str, menu: PatchMenu) -> MenuResponse:
+    async def patch_menu(self, menu_id: str, menu: PatchMenu) -> MenuResponse:
         menu = menu.to_dict()
-        patched_menu = await MenuRepository.patch_menu(menu_id, menu)
-        await cls.__check_response(patched_menu)
-        return await cls.__turn_to_model(patched_menu)
+        patched_menu = await self.menu_repository.patch_menu(menu_id, menu)
+        await self.__check_response(patched_menu)
+        return await self.__turn_to_model(patched_menu)
         # clear_cache('menu', 'all_menu')
         # set_cache('menu', menu_id, patched_menu)
 
-    @classmethod
-    async def delete(cls, menu_id: str) -> dict[str, str | bool]:
-        result = await MenuRepository.delete(menu_id)
-        # print(result)
-        # await cls.__check_response(result)
+    async def delete(self, menu_id: str) -> dict[str, str | bool]:
+        result = await self.menu_repository.delete(menu_id)
+        await self.__check_response(result)
         # clear_cache('menu', 'all_menu')
         # clear_cache('menu', menu_id)
         return result
 
-    @classmethod
-    async def count_menu(cls) -> int:
-        counter = await MenuRepository.count()
-        return counter
-
-    @classmethod
-    async def delete_all(cls) -> None:
+    async def delete_all(self) -> None:
         # redis_client.flushdb()
-        MenuRepository.delete_all()
+        await self.menu_repository.delete_all()
 
     @staticmethod
     async def __turn_to_model(orm_response) -> MenuResponse:
