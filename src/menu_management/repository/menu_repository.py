@@ -12,10 +12,10 @@ class MenuRepository:
     def __init__(self, session: AsyncSession = Depends(get_session)):
         self.session = session
 
-    async def get_menu_list(self):
+    async def get_menu_list(self) -> list[Menu]:
         stmt = select(Menu)
         result = await self.session.execute(stmt)
-        return result.scalars().fetchall()
+        return list(result.scalars().fetchall())
 
     async def get_menu(self, menu_id: str) -> Menu:
         stmt = select(Menu).where(Menu.id == menu_id).limit(1)

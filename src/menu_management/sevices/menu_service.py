@@ -10,10 +10,10 @@ from src.menu_management.utils import dishes_counter, submenus_counter
 
 class MenuService:
 
-    def __init__(self, menu_repository: MenuRepository = Depends()):
+    def __init__(self, menu_repository: MenuRepository = Depends()) -> None:
         self.menu_repository = menu_repository
 
-    async def get_all_menu(self) -> list[MenuResponse] | None:
+    async def get_all_menu(self) -> list[Menu] | None:
         # cache = get_cache('menu', 'all_menu')
         # if isinstance(cache, list):
         #     return cache
