@@ -7,7 +7,7 @@ from src.menu_management.schemas.schemas import (
     PatchSubmenu,
     SubmenuResponse,
 )
-from src.menu_management.sevices.submenu_servise import SubmenuService
+from src.menu_management.sevices.submenu_service import SubmenuService
 
 submenu_router = APIRouter(
     prefix='/api/v1/menus/{menu_id}/submenus',
