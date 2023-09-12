@@ -3,6 +3,8 @@ from contextlib import nullcontext as does_not_raise
 import pytest
 from httpx import AsyncClient
 
+from src.cache.client import redis_client
+
 
 class TestSubmenu:
     random_id = '5f4a67c2-832e-4975-b5cf-c3ed35015d98'
@@ -41,7 +43,7 @@ class TestSubmenu:
         assert len(response.json()) == 1
         assert response.json() == [{'id': response.json()[0].get('id'), 'title': 'test_submenu',
                                     'description': 'description', 'dishes_count': 0}]
-
+        redis_client.flushdb()
         response = await ac.get(f'/api/v1/menus/{self.invalid_id}/submenus/')
         assert response.status_code == 404
         assert response.json() == {'detail': f"<class 'asyncpg.exceptions.DataError'>: invalid input for query argument"
