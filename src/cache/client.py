@@ -7,9 +7,6 @@ from src.config import settings
 redis_client = redis.StrictRedis(host=f'{settings.REDIS_HOST}', port=settings.REDIS_PORT, db=0)
 
 
-# redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
-
-
 class RedisClient:
     @staticmethod
     def generate_key(prefix, body):
