@@ -2,8 +2,6 @@ from fastapi import Depends, HTTPException
 
 from src.cache.client import RedisClient
 from src.database.models import Dish
-
-# from cache.client import clear_cache, get_cache, set_cache
 from src.menu_management.repository.dish_repository import DishRepository
 from src.menu_management.schemas.schemas import CreateDish, PatchDish
 from src.menu_management.sevices.submenu_service import SubmenuService
