@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException
+from fastapi import BackgroundTasks, Depends, HTTPException
 
 from src.cache.client import RedisClient
 from src.database.models import Submenu
@@ -15,16 +15,18 @@ from src.menu_management.utils import dishes_counter
 
 class SubmenuService:
 
-    def __init__(self, submenu_repository: SubmenuRepository = Depends(), redis_cache: RedisClient = Depends()):
+    def __init__(self, background_tasks: BackgroundTasks, submenu_repository: SubmenuRepository = Depends(),
+                 redis_cache: RedisClient = Depends()):
         self.submenu_repository = submenu_repository
         self.redis_cache = redis_cache
+        self.background_task = background_tasks
 
     async def get_all_submenus(self, menu_id: str) -> list[SubmenuResponse]:
         cache = self.redis_cache.get_cache('submenu', 'all_submenu')
         if cache:
             return cache
         submenu_list = await self.submenu_repository.get_list_submenus(menu_id)
-        await self.redis_cache.set_cache('submenu', 'all_submenu', submenu_list)
+        self.background_task.add_task(self.redis_cache.set_cache, 'submenu', 'all_submenu', submenu_list)
         return [await self.__turn_to_model(submenu) for submenu in submenu_list]
 
     async def get_submenu(self, submenu_id: str) -> SubmenuResponse:
@@ -32,7 +34,7 @@ class SubmenuService:
         if cache:
             return cache
         submenu = await self.submenu_repository.get_submenu(submenu_id)
-        await self.redis_cache.set_cache('submenu', submenu_id, submenu)
+        self.background_task.add_task(self.redis_cache.set_cache, 'submenu', submenu_id, submenu)
         await self.__check_response(submenu)
         return await self.__turn_to_model(submenu)
 
@@ -40,28 +42,28 @@ class SubmenuService:
         new_submenu = submenu.to_dict()
         new_submenu['menu_group'] = menu_id
         new_submenu = await self.submenu_repository.add_submenu(new_submenu)
-        await self.redis_cache.clear_cache('submenu', 'all_submenu')
-        await self.redis_cache.clear_cache('menu', 'all_menu')
-        await self.redis_cache.clear_cache('menu', menu_id)
-        await self.redis_cache.set_cache('submenu', new_submenu.id, new_submenu)
+        self.background_task.add_task(self.redis_cache.clear_cache, 'submenu', 'all_submenu')
+        self.background_task.add_task(self.redis_cache.clear_cache, 'menu', 'all_menu')
+        self.background_task.add_task(self.redis_cache.clear_cache, 'menu', menu_id)
+        self.background_task.add_task(self.redis_cache.set_cache, 'submenu', new_submenu.id, new_submenu)
         return new_submenu
 
     async def patch_submenu(self, submenu_id: str, submenu: PatchSubmenu) -> SubmenuResponse:
         submenu = submenu.to_dict()
         patched_submenu = await self.submenu_repository.update_submenu(submenu_id, submenu)
-        await self.redis_cache.clear_cache('submenu', 'all_submenu')
-        await self.redis_cache.set_cache('submenu', submenu_id, patched_submenu)
+        self.background_task.add_task(self.redis_cache.clear_cache, 'submenu', 'all_submenu')
+        self.background_task.add_task(self.redis_cache.set_cache, 'submenu', submenu_id, patched_submenu)
         await self.__check_response(patched_submenu)
         return await self.__turn_to_model(patched_submenu)
 
     async def delete(self, submenu_id: str, menu_id: str) -> dict[str, str | bool]:
         result = await self.submenu_repository.delete_submenu(submenu_id)
-        await self.redis_cache.clear_cache('submenu', 'all_submenu')
-        await self.redis_cache.clear_cache('submenu', submenu_id)
-        await self.redis_cache.clear_cache('menu', 'all_menu')
-        await self.redis_cache.clear_cache('menu', menu_id)
-        await self.redis_cache.clear_cache('dish', submenu_id)
-        await self.redis_cache.clear_cache('all_dish', submenu_id)
+        self.background_task.add_task(self.redis_cache.clear_cache, 'submenu', 'all_submenu')
+        self.background_task.add_task(self.redis_cache.clear_cache, 'submenu', submenu_id)
+        self.background_task.add_task(self.redis_cache.clear_cache, 'menu', 'all_menu')
+        self.background_task.add_task(self.redis_cache.clear_cache, 'menu', menu_id)
+        self.background_task.add_task(self.redis_cache.clear_cache, 'dish', submenu_id)
+        self.background_task.add_task(self.redis_cache.clear_cache, 'all_dish', submenu_id)
         await self.__check_response(result)
         return result
 

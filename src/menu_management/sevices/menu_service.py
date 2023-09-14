@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException
+from fastapi import BackgroundTasks, Depends, HTTPException
 
 from src.cache.client import RedisClient, redis_client
 from src.database.models import Menu
@@ -9,16 +9,18 @@ from src.menu_management.utils import dishes_counter, submenus_counter
 
 class MenuService:
 
-    def __init__(self, menu_repository: MenuRepository = Depends(), redis_cache: RedisClient = Depends()) -> None:
+    def __init__(self, background_tasks: BackgroundTasks, menu_repository: MenuRepository = Depends(),
+                 redis_cache: RedisClient = Depends()) -> None:
         self.menu_repository = menu_repository
         self.redis_cache = redis_cache
+        self.background_task = background_tasks
 
     async def get_all_menu(self) -> list[MenuResponse] | None:
         cache = self.redis_cache.get_cache('menu', 'all_menu')
         if cache:
             return cache
         menus = await self.menu_repository.get_menu_list()
-        await self.redis_cache.set_cache('menu', 'all_menu', menus)
+        self.background_task.add_task(self.redis_cache.set_cache, 'menu', 'all_menu', menus)
         return [await self.__turn_to_model(menu) for menu in menus]
 
     async def get_menu(self, menu_id: str) -> MenuResponse:
@@ -27,33 +29,33 @@ class MenuService:
             return cache
         menu = await self.menu_repository.get_menu(menu_id)
         await self.__check_response(menu)
-        await self.redis_cache.set_cache('menu', menu_id, menu)
+        self.background_task.add_task(self.redis_cache.set_cache, 'menu', menu_id, menu)
         return await self.__turn_to_model(menu)
 
     async def post_menu(self, new_menu: CreateMenu) -> Menu:
         new_menu = new_menu.to_dict()
         added_menu = await self.menu_repository.add_new_menu(new_menu)
-        await self.redis_cache.set_cache('menu', added_menu.id, added_menu)
-        await self.redis_cache.clear_cache('menu', 'all_menu')
+        self.background_task.add_task(self.redis_cache.set_cache, 'menu', added_menu.id, added_menu)
+        self.background_task.add_task(self.redis_cache.clear_cache, 'menu', 'all_menu')
         return added_menu
 
     async def patch_menu(self, menu_id: str, menu: PatchMenu) -> MenuResponse:
         menu = menu.to_dict()
         patched_menu = await self.menu_repository.patch_menu(menu_id, menu)
         await self.__check_response(patched_menu)
-        await self.redis_cache.clear_cache('menu', 'all_menu')
-        await self.redis_cache.set_cache('menu', menu_id, patched_menu)
+        self.background_task.add_task(self.redis_cache.clear_cache, 'menu', 'all_menu')
+        self.background_task.add_task(self.redis_cache.set_cache, 'menu', menu_id, patched_menu)
         return await self.__turn_to_model(patched_menu)
 
     async def delete(self, menu_id: str) -> dict[str, str | bool]:
         result = await self.menu_repository.delete(menu_id)
         await self.__check_response(result)
-        await self.redis_cache.clear_cache('menu', 'all_menu')
-        await self.redis_cache.clear_cache('menu', menu_id)
+        self.background_task.add_task(self.redis_cache.clear_cache, 'menu', 'all_menu')
+        self.background_task.add_task(self.redis_cache.clear_cache, 'menu', menu_id)
         return result
 
     async def delete_all(self) -> None:
-        redis_client.flushdb()
+        self.background_task.add_task(redis_client.flushdb)
         await self.menu_repository.delete_all()
 
     @staticmethod
