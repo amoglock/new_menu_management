@@ -4,7 +4,7 @@ from sqlalchemy.exc import DBAPIError, IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database.db import get_session
-from src.database.models import Menu
+from src.database.models import Dish, Menu, Submenu
 
 
 class MenuRepository:
@@ -25,6 +25,22 @@ class MenuRepository:
             return result
         except DBAPIError as e:
             raise HTTPException(status_code=404, detail=f'{e.orig}')
+
+    async def get_whole_base(self):
+        menu_list: list[Menu] = await self.get_menu_list()
+        result: list = []
+        for menu in menu_list:
+            submenu_list = await self.session.execute(select(Submenu).filter_by(menu_group=menu.id))
+            submenu_list = [submenu.__dict__ for submenu in submenu_list.scalars().fetchall()]
+            for submenu in submenu_list:
+                dishes = await self.session.execute(select(Dish).where(Dish.submenu_group == submenu.get('id')))
+                dishes = [dish.__dict__ for dish in dishes.scalars().fetchall()]
+                del submenu['menu_group']
+                submenu['dishes'] = dishes
+            menu = menu.__dict__
+            menu['submenus'] = submenu_list
+            result.append(menu)
+        return result
 
     async def add_new_menu(self, values: dict) -> Menu:
         stmt = insert(Menu).values(**values).returning(Menu)

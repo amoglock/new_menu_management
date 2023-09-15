@@ -23,6 +23,10 @@ class MenuService:
         self.background_task.add_task(self.redis_cache.set_cache, 'menu', 'all_menu', menus)
         return [await self.__turn_to_model(menu) for menu in menus]
 
+    async def get_whole_base(self):
+        result = await self.menu_repository.get_whole_base()
+        return result
+
     async def get_menu(self, menu_id: str) -> MenuResponse:
         cache = self.redis_cache.get_cache('menu', menu_id)
         if cache:

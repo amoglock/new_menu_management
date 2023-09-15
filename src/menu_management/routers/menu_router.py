@@ -19,6 +19,12 @@ async def get_all_menus(menu_service: MenuService = Depends()):
     return result
 
 
+@menu_router.get('/getbase', status_code=200)
+async def get_base(menu_service: MenuService = Depends()):
+    result = await menu_service.get_whole_base()
+    return result
+
+
 @menu_router.get('/{menu_id}', response_model=MenuResponse, status_code=200,
                  description='Возвращает экземпляр определенного меню по переданному menu_id. Если menu_id не найден - '
                              'вызывается исключение с ошибкой 404', summary='получить определенное меню')
