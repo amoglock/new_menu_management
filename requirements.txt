@@ -1,6 +1,6 @@
 alembic==1.11.1
 asyncpg==0.28.0
-fastapi==0.100.1
+fastapi==0.109.1
 gunicorn==21.2.0
 httpx==0.24.1
 pendulum==2.1.2
